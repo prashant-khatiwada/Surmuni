@@ -536,8 +536,13 @@ const winampMainMenu = document.getElementById("winamp-main-menu") as HTMLElemen
 
 function openMainMenu(x: number, y: number) {
   if (!winampMainMenu) return;
-  winampMainMenu.style.left = `${Math.max(0, Math.min(x, window.innerWidth - 180))}px`;
-  winampMainMenu.style.top = `${Math.max(0, Math.min(y, window.innerHeight - 240))}px`;
+  // Position the main menu so that flyout submenus cascade inward or outward safely
+  const menuW = 145;
+  const clampedX = Math.max(10, Math.min(x, 275 - menuW - 10));
+  const clampedY = Math.max(10, Math.min(y, window.innerHeight - 200));
+
+  winampMainMenu.style.left = `${clampedX}px`;
+  winampMainMenu.style.top = `${clampedY}px`;
   winampMainMenu.style.display = "block";
 }
 
