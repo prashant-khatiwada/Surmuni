@@ -1,8 +1,9 @@
 // Magnetic Snap & Tethered Dock Engine for Surmuni / Winamp
-// Emulates Winamp 2.x's snap.cpp physics with 12px magnetic attraction,
-// supports both:
-// 1. "Docked Stack" mode (all windows stacked into one unified frame)
-// 2. "Detached Windows" mode (windows can be pulled apart, moved freely, and snap back together)
+// 1:1 Parity with OneAmp (layout.rs) and Winamp 2.x geometry:
+// - Transitive docked groups (docked_group): windows touching share a group.
+// - Follower dragging: moving any window moves all transitively docked windows.
+// - 12px magnetic edge snapping with orthogonal axis proximity checks.
+// - Full support for Docked Stack vs Detached Windows across macOS, Windows, X11 (Wayland keeps docked stack).
 
 export interface WindowRect {
   id: string;
@@ -13,94 +14,133 @@ export interface WindowRect {
 }
 
 export class MagneticDockEngine {
-  private static readonly SNAP_DISTANCE = 14; // 14px magnetic snap threshold
+  public static readonly SNAP_DISTANCE = 12; // 12px magnetic snap threshold (matches Winamp/OneAmp 10-12px)
+  public static readonly TOUCH_EPS = 2.5; // Two edges closer than this count as touching
   public static isDetachedMode = false;
-  private static dockedGroups: Map<string, Set<string>> = new Map(); // id -> set of docked window IDs
+  public static isDetachedSupported = true; // False on Linux Wayland
+  private static windowPositions: Map<string, { x: number; y: number }> = new Map();
 
-  static snapToWindows(
-    movingRect: WindowRect,
-    otherRects: WindowRect[]
-  ): { x: number; y: number; snappedX: boolean; snappedY: boolean; snappedToId?: string } {
-    let bestX = movingRect.x;
-    let bestY = movingRect.y;
-    let snappedX = false;
-    let snappedY = false;
-    let snappedToId: string | undefined = undefined;
+  /**
+   * Two rects touch if they share an edge (vertical or horizontal) and overlap along the other axis.
+   */
+  static touching(a: WindowRect, b: WindowRect): boolean {
+    const overlapX = a.x < (b.x + b.width - this.TOUCH_EPS) && b.x < (a.x + a.width - this.TOUCH_EPS);
+    const overlapY = a.y < (b.y + b.height - this.TOUCH_EPS) && b.y < (a.y + a.height - this.TOUCH_EPS);
 
-    let minDiffX = MagneticDockEngine.SNAP_DISTANCE;
-    let minDiffY = MagneticDockEngine.SNAP_DISTANCE;
+    const verticalEdge =
+      Math.abs((a.x + a.width) - b.x) <= this.TOUCH_EPS ||
+      Math.abs((b.x + b.width) - a.x) <= this.TOUCH_EPS;
 
-    for (const target of otherRects) {
-      // Horizontal alignments:
-      // 1. movingRect.left -> target.right
-      const diffLeftToRight = Math.abs(movingRect.x - (target.x + target.width));
-      if (diffLeftToRight < minDiffX) {
-        minDiffX = diffLeftToRight;
-        bestX = target.x + target.width;
-        snappedX = true;
-        snappedToId = target.id;
-      }
+    const horizontalEdge =
+      Math.abs((a.y + a.height) - b.y) <= this.TOUCH_EPS ||
+      Math.abs((b.y + b.height) - a.y) <= this.TOUCH_EPS;
 
-      // 2. movingRect.right -> target.left
-      const diffRightToLeft = Math.abs((movingRect.x + movingRect.width) - target.x);
-      if (diffRightToLeft < minDiffX) {
-        minDiffX = diffRightToLeft;
-        bestX = target.x - movingRect.width;
-        snappedX = true;
-        snappedToId = target.id;
-      }
+    return (verticalEdge && overlapY) || (horizontalEdge && overlapX);
+  }
 
-      // 3. movingRect.left -> target.left (flush vertical alignment)
-      const diffLeftToLeft = Math.abs(movingRect.x - target.x);
-      if (diffLeftToLeft < minDiffX) {
-        minDiffX = diffLeftToLeft;
-        bestX = target.x;
-        snappedX = true;
-        snappedToId = target.id;
-      }
+  /**
+   * Computes all windows transitively docked to rootId.
+   */
+  static getDockedGroup(rects: Map<string, WindowRect>, rootId: string): Set<string> {
+    const group = new Set<string>([rootId]);
+    let added = true;
 
-      // Vertical alignments:
-      // 1. movingRect.top -> target.bottom
-      const diffTopToBottom = Math.abs(movingRect.y - (target.y + target.height));
-      if (diffTopToBottom < minDiffY) {
-        minDiffY = diffTopToBottom;
-        bestY = target.y + target.height;
-        snappedY = true;
-        snappedToId = target.id;
-      }
+    while (added) {
+      added = false;
+      for (const id of Array.from(group)) {
+        const current = rects.get(id);
+        if (!current) continue;
 
-      // 2. movingRect.bottom -> target.top
-      const diffBottomToTop = Math.abs((movingRect.y + movingRect.height) - target.y);
-      if (diffBottomToTop < minDiffY) {
-        minDiffY = diffBottomToTop;
-        bestY = target.y - movingRect.height;
-        snappedY = true;
-        snappedToId = target.id;
-      }
-
-      // 3. movingRect.top -> target.top (flush horizontal alignment)
-      const diffTopToTop = Math.abs(movingRect.y - target.y);
-      if (diffTopToTop < minDiffY) {
-        minDiffY = diffTopToTop;
-        bestY = target.y;
-        snappedY = true;
-        snappedToId = target.id;
+        for (const [targetId, targetRect] of rects.entries()) {
+          if (!group.has(targetId) && this.touching(current, targetRect)) {
+            group.add(targetId);
+            added = true;
+          }
+        }
       }
     }
 
-    return { x: bestX, y: bestY, snappedX, snappedY, snappedToId };
+    return group;
   }
 
-  // Attaches native mouse dragging and magnetic snapping to an element
-  static enableSnapping(element: HTMLElement, container: HTMLElement, onNativeDrag?: () => void) {
+  /**
+   * Corrects move delta so moving rects snap onto target edges.
+   */
+  static snapOffset(
+    movingGroup: WindowRect[],
+    targets: WindowRect[]
+  ): { dx: number; dy: number; snapped: boolean } {
+    let bestDx: number | null = null;
+    let bestDy: number | null = null;
+
+    const considerX = (d: number) => {
+      if (Math.abs(d) <= MagneticDockEngine.SNAP_DISTANCE) {
+        if (bestDx === null || Math.abs(d) < Math.abs(bestDx)) {
+          bestDx = d;
+        }
+      }
+    };
+
+    const considerY = (d: number) => {
+      if (Math.abs(d) <= MagneticDockEngine.SNAP_DISTANCE) {
+        if (bestDy === null || Math.abs(d) < Math.abs(bestDy)) {
+          bestDy = d;
+        }
+      }
+    };
+
+    for (const m of movingGroup) {
+      for (const t of targets) {
+        // Only snap sideways when rects are near each other on Y axis
+        const nearY =
+          m.y <= (t.y + t.height + MagneticDockEngine.SNAP_DISTANCE) &&
+          t.y <= (m.y + m.height + MagneticDockEngine.SNAP_DISTANCE);
+
+        // Only snap vertically when rects are near each other on X axis
+        const nearX =
+          m.x <= (t.x + t.width + MagneticDockEngine.SNAP_DISTANCE) &&
+          t.x <= (m.x + m.width + MagneticDockEngine.SNAP_DISTANCE);
+
+        if (nearY) {
+          considerX((t.x + t.width) - m.x); // left to right edge
+          considerX(t.x - (m.x + m.width)); // right to left edge
+          considerX(t.x - m.x);             // align lefts
+          considerX((t.x + t.width) - (m.x + m.width)); // align rights
+        }
+
+        if (nearX) {
+          considerY((t.y + t.height) - m.y); // top to bottom edge
+          considerY(t.y - (m.y + m.height)); // bottom to top edge
+          considerY(t.y - m.y);             // align tops
+          considerY((t.y + t.height) - (m.y + m.height)); // align bottoms
+        }
+      }
+    }
+
+    return {
+      dx: bestDx ?? 0,
+      dy: bestDy ?? 0,
+      snapped: bestDx !== null || bestDy !== null,
+    };
+  }
+
+  /**
+   * Attaches mouse dragging and magnetic snapping to a window.
+   */
+  static enableSnapping(
+    element: HTMLElement,
+    container: HTMLElement,
+    onNativeDrag?: () => void,
+    onMoveEnd?: () => void
+  ) {
     const handle = element.querySelector(".window-titlebar") as HTMLElement;
     if (!handle) return;
 
     let isDragging = false;
-    let startX = 0;
-    let startY = 0;
-    let initialLeft = 0;
-    let initialTop = 0;
+    let startPointerX = 0;
+    let startPointerY = 0;
+    let initialPositions = new Map<string, { left: number; top: number }>();
+    let movingIds = new Set<string>();
 
     handle.style.cursor = "move";
 
@@ -117,114 +157,132 @@ export class MagneticDockEngine {
     });
 
     handle.addEventListener("mousedown", (e) => {
-      // Ignore clicks on buttons/inputs
       const target = e.target as HTMLElement;
       if (target.closest("button") || target.closest("select") || target.closest("input")) return;
       if (e.button !== 0) return;
 
-      // If in docked mode, delegate to Tauri native window dragging
+      // In docked mode, delegate to Tauri native window dragging
       if (!MagneticDockEngine.isDetachedMode) {
         if (onNativeDrag) onNativeDrag();
         return;
       }
 
       isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
+      startPointerX = e.clientX;
+      startPointerY = e.clientY;
 
-      const rect = element.getBoundingClientRect();
       const parentRect = container.getBoundingClientRect();
-      initialLeft = rect.left - parentRect.left;
-      initialTop = rect.top - parentRect.top;
 
-      element.style.position = "absolute";
-      element.style.zIndex = "100";
-      element.style.left = `${initialLeft}px`;
-      element.style.top = `${initialTop}px`;
-      element.style.width = `${rect.width}px`;
+      // Read current rects of all visible windows
+      const currentRects = new Map<string, WindowRect>();
+      const allWindows = container.querySelectorAll<HTMLElement>(".winamp-window");
 
-      // Track docked windows that should move along with this window
-      const dockedFollowers: { el: HTMLElement; origLeft: number; origTop: number }[] = [];
-      const currentId = element.id || "main-window";
-      const group = MagneticDockEngine.dockedGroups.get(currentId);
+      allWindows.forEach((w) => {
+        if (w.style.display !== "none") {
+          const wRect = w.getBoundingClientRect();
+          const left = wRect.left - parentRect.left;
+          const top = wRect.top - parentRect.top;
+          currentRects.set(w.id, {
+            id: w.id,
+            x: left,
+            y: top,
+            width: w.offsetWidth,
+            height: w.offsetHeight,
+          });
+        }
+      });
 
-      if (group) {
-        group.forEach((otherId) => {
-          const otherEl = document.getElementById(otherId);
-          if (otherEl && otherEl !== element && otherEl.style.display !== "none") {
-            const oRect = otherEl.getBoundingClientRect();
-            dockedFollowers.push({
-              el: otherEl,
-              origLeft: oRect.left - parentRect.left,
-              origTop: oRect.top - parentRect.top,
-            });
-          }
-        });
-      }
+      // Compute which windows are transitively docked to this one
+      const currentId = element.id;
+      movingIds = MagneticDockEngine.getDockedGroup(currentRects, currentId);
+
+      // Snapshot initial positions for all moving group members
+      initialPositions.clear();
+      movingIds.forEach((id) => {
+        const wEl = document.getElementById(id);
+        if (wEl) {
+          const r = wEl.getBoundingClientRect();
+          const left = r.left - parentRect.left;
+          const top = r.top - parentRect.top;
+          initialPositions.set(id, { left, top });
+          wEl.style.position = "absolute";
+          wEl.style.left = `${left}px`;
+          wEl.style.top = `${top}px`;
+          wEl.style.zIndex = id === currentId ? "30" : "28";
+        }
+      });
 
       const onMouseMove = (moveEvent: MouseEvent) => {
         if (!isDragging) return;
-        const dx = moveEvent.clientX - startX;
-        const dy = moveEvent.clientY - startY;
 
-        let curX = initialLeft + dx;
-        let curY = initialTop + dy;
+        const rawDx = moveEvent.clientX - startPointerX;
+        const rawDy = moveEvent.clientY - startPointerY;
 
-        // Gather bounding boxes of all other visible windows in container
-        const otherRects: WindowRect[] = [];
-        const windows = container.querySelectorAll<HTMLElement>(".winamp-window");
-        windows.forEach((w) => {
-          if (w !== element && w.style.display !== "none") {
-            const wRect = w.getBoundingClientRect();
-            otherRects.push({
-              id: w.id || "unnamed-window",
-              x: wRect.left - parentRect.left,
-              y: wRect.top - parentRect.top,
-              width: wRect.width,
-              height: wRect.height,
+        // If the user drags away with significant force (> 20px) while other group members exist,
+        // break away and drag only this window
+        if (movingIds.size > 1 && (Math.abs(rawDx) > 28 || Math.abs(rawDy) > 28) && moveEvent.shiftKey) {
+          movingIds = new Set([currentId]);
+        }
+
+        // Build target rects (windows that are NOT moving)
+        const targets: WindowRect[] = [];
+        allWindows.forEach((w) => {
+          if (w.style.display !== "none" && !movingIds.has(w.id)) {
+            const r = w.getBoundingClientRect();
+            targets.push({
+              id: w.id,
+              x: r.left - parentRect.left,
+              y: r.top - parentRect.top,
+              width: w.offsetWidth,
+              height: w.offsetHeight,
             });
           }
         });
 
-        const movingRect: WindowRect = {
-          id: currentId,
-          x: curX,
-          y: curY,
-          width: element.offsetWidth,
-          height: element.offsetHeight,
-        };
-
-        const snapped = MagneticDockEngine.snapToWindows(movingRect, otherRects);
-        element.style.left = `${snapped.x}px`;
-        element.style.top = `${snapped.y}px`;
-
-        // If snapped to another window, register dock relationship
-        if (snapped.snappedToId) {
-          if (!MagneticDockEngine.dockedGroups.has(currentId)) {
-            MagneticDockEngine.dockedGroups.set(currentId, new Set());
+        // Compute proposed moving rects
+        const movingRects: WindowRect[] = [];
+        movingIds.forEach((id) => {
+          const init = initialPositions.get(id);
+          const wEl = document.getElementById(id);
+          if (init && wEl) {
+            movingRects.push({
+              id,
+              x: init.left + rawDx,
+              y: init.top + rawDy,
+              width: wEl.offsetWidth,
+              height: wEl.offsetHeight,
+            });
           }
-          MagneticDockEngine.dockedGroups.get(currentId)!.add(snapped.snappedToId);
+        });
 
-          if (!MagneticDockEngine.dockedGroups.has(snapped.snappedToId)) {
-            MagneticDockEngine.dockedGroups.set(snapped.snappedToId, new Set());
+        // Calculate magnetic snap offset
+        const snap = MagneticDockEngine.snapOffset(movingRects, targets);
+        const finalDx = rawDx + snap.dx;
+        const finalDy = rawDy + snap.dy;
+
+        // Move all members of the moving group synchronously
+        movingIds.forEach((id) => {
+          const init = initialPositions.get(id);
+          const wEl = document.getElementById(id);
+          if (init && wEl) {
+            const newX = Math.max(0, init.left + finalDx);
+            const newY = Math.max(0, init.top + finalDy);
+            wEl.style.left = `${newX}px`;
+            wEl.style.top = `${newY}px`;
+            MagneticDockEngine.windowPositions.set(id, { x: newX, y: newY });
           }
-          MagneticDockEngine.dockedGroups.get(snapped.snappedToId)!.add(currentId);
-        }
-
-        // Move all docked follower windows simultaneously with 0ms lag
-        const actualDx = snapped.x - initialLeft;
-        const actualDy = snapped.y - initialTop;
-        dockedFollowers.forEach((follower) => {
-          follower.el.style.left = `${follower.origLeft + actualDx}px`;
-          follower.el.style.top = `${follower.origTop + actualDy}px`;
         });
       };
 
       const onMouseUp = () => {
         isDragging = false;
-        element.style.zIndex = "25";
+        movingIds.forEach((id) => {
+          const wEl = document.getElementById(id);
+          if (wEl) wEl.style.zIndex = "15";
+        });
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("mouseup", onMouseUp);
+        if (onMoveEnd) onMoveEnd();
       };
 
       window.addEventListener("mousemove", onMouseMove);
@@ -232,35 +290,62 @@ export class MagneticDockEngine {
     });
   }
 
-  // Switch between Docked Stack and Detached Windows mode
+  /**
+   * Switch between Docked Stack and Detached Windows mode.
+   */
   static setDetachedMode(detached: boolean, container: HTMLElement) {
+    if (detached && !MagneticDockEngine.isDetachedSupported) {
+      console.warn("Detached mode is not supported on Wayland. Keeping docked stack.");
+      return;
+    }
+
     MagneticDockEngine.isDetachedMode = detached;
     const windows = container.querySelectorAll<HTMLElement>(".winamp-window");
 
     if (detached) {
       container.classList.add("detached-canvas");
-      // Calculate spread-out or side-by-side retro initial layout
-      let currentTop = 10;
+      // Restore or initialize positions for detached windows
+      let offsetTop = 16;
       windows.forEach((w) => {
         if (w.style.display !== "none") {
-          const rect = w.getBoundingClientRect();
+          const saved = MagneticDockEngine.windowPositions.get(w.id);
           w.style.position = "absolute";
-          w.style.left = w.style.left || "16px";
-          w.style.top = `${currentTop}px`;
+          w.style.left = saved ? `${saved.x}px` : "20px";
+          w.style.top = saved ? `${saved.y}px` : `${offsetTop}px`;
           w.style.zIndex = "15";
-          currentTop += rect.height + 6;
+          offsetTop += (w.offsetHeight || 116) + 12;
         }
       });
     } else {
       container.classList.remove("detached-canvas");
-      // Reset all windows to relative stacked layout
+      // Reset all windows to docked vertical stack
       windows.forEach((w) => {
-        w.style.position = "static";
+        w.style.position = "relative";
         w.style.left = "";
         w.style.top = "";
         w.style.zIndex = "";
       });
-      MagneticDockEngine.dockedGroups.clear();
     }
+  }
+
+  /**
+   * Get saved positions for session persistence.
+   */
+  static getPositions(): Record<string, { x: number; y: number }> {
+    const out: Record<string, { x: number; y: number }> = {};
+    MagneticDockEngine.windowPositions.forEach((v, k) => {
+      out[k] = v;
+    });
+    return out;
+  }
+
+  /**
+   * Restore positions from session storage.
+   */
+  static restorePositions(positions: Record<string, { x: number; y: number }>) {
+    if (!positions) return;
+    Object.entries(positions).forEach(([k, v]) => {
+      MagneticDockEngine.windowPositions.set(k, v);
+    });
   }
 }

@@ -26,6 +26,15 @@
 
         <!-- Main Body -->
         <div class="main-body">
+          <!-- Clutterbar (O A I D V strip) -->
+          <div class="clutterbar" id="clutterbar">
+            <button class="clutter-btn" id="clutter-o" title="Options / Main Menu">O</button>
+            <button class="clutter-btn" id="clutter-a" title="Always on Top [Ctrl+A]">A</button>
+            <button class="clutter-btn" id="clutter-i" title="File Info / Tag Editor">I</button>
+            <button class="clutter-btn" id="clutter-d" title="Double Size (2×) [Ctrl+D]">D</button>
+            <button class="clutter-btn" id="clutter-v" title="Visualizer Mode">V</button>
+          </div>
+
           <!-- Top Row: LCD Display + Visualizer -->
           <div class="display-area">
             <!-- Left: Visualizer Canvas -->
@@ -462,6 +471,78 @@
           <div class="prefs-footer" style="padding-top: 8px; justify-content: flex-end; gap: 8px;">
             <button class="pl-btn" id="btn-tag-cancel">CANCEL</button>
             <button class="pl-btn" id="btn-tag-save" style="background: #2563eb; color: #fff;">💾 SAVE TAGS</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTHENTIC WINAMP CASCADING MAIN MENU -->
+      <div class="winamp-menu-popup" id="winamp-main-menu" style="display: none;">
+        <!-- Root Menu Column -->
+        <div class="winamp-menu-item has-submenu" id="menu-root-player">
+          <span>Player</span>
+          <div class="winamp-submenu">
+            <div class="winamp-menu-item" id="menu-item-open-file">Open file…</div>
+            <div class="winamp-menu-item" id="menu-item-open-folder">Open folder…</div>
+            <div class="winamp-menu-item" id="menu-item-jump">Jump to file… [J / F3]</div>
+            <div class="winamp-menu-item" id="menu-item-load-pl">Load playlist…</div>
+            <div class="winamp-menu-item" id="menu-item-save-pl">Save playlist…</div>
+            <div class="winamp-menu-divider"></div>
+            <div class="winamp-menu-item" id="menu-item-clear-pl">Clear playlist</div>
+            <div class="winamp-menu-divider"></div>
+            <div class="winamp-menu-item" id="menu-item-quit">Quit [Cmd+Q / Alt+F4]</div>
+          </div>
+        </div>
+
+        <div class="winamp-menu-item has-submenu" id="menu-root-view">
+          <span>View</span>
+          <div class="winamp-submenu">
+            <div class="winamp-menu-item has-submenu" id="menu-sub-scale">
+              <span>Scale</span>
+              <div class="winamp-submenu">
+                <div class="winamp-menu-item checked" id="menu-scale-1x">1× (Original)</div>
+                <div class="winamp-menu-item" id="menu-scale-2x">2× (Double Size · Ctrl+D)</div>
+                <div class="winamp-menu-item" id="menu-scale-3x">3×</div>
+              </div>
+            </div>
+            <div class="winamp-menu-item has-submenu" id="menu-sub-vis">
+              <span>Visualizer</span>
+              <div class="winamp-submenu">
+                <div class="winamp-menu-item" id="menu-vis-spectrum">Spectrum</div>
+                <div class="winamp-menu-item" id="menu-vis-oscilloscope">Oscilloscope</div>
+                <div class="winamp-menu-item" id="menu-vis-vu">Peak VU Meter</div>
+                <div class="winamp-menu-item" id="menu-vis-milkdrop">MilkDrop 2 WebGL [Ctrl+Shift+K]</div>
+                <div class="winamp-menu-divider"></div>
+                <div class="winamp-menu-item" id="menu-vis-off">Off</div>
+              </div>
+            </div>
+            <div class="winamp-menu-item" id="menu-item-shade">Mini mode (Windowshade) [▾]</div>
+            <div class="winamp-menu-divider"></div>
+            <div class="winamp-menu-item checked" id="menu-item-toggle-eq">Equalizer [Alt+G]</div>
+            <div class="winamp-menu-item checked" id="menu-item-toggle-pl">Playlist [Alt+E]</div>
+            <div class="winamp-menu-item" id="menu-item-toggle-detached">Detached windows [Alt+D]</div>
+            <div class="winamp-menu-item" id="menu-item-toggle-ontop">Always on top [Ctrl+A]</div>
+            <div class="winamp-menu-divider"></div>
+            <div class="winamp-menu-item" id="menu-item-change-skin">Change skin… (Skin Museum)</div>
+          </div>
+        </div>
+
+        <div class="winamp-menu-item has-submenu" id="menu-root-audio">
+          <span>Audio</span>
+          <div class="winamp-submenu">
+            <div class="winamp-menu-item" id="menu-item-crossfade">Crossfade (2.0s)</div>
+            <div class="winamp-menu-item" id="menu-item-mono">Mono playback</div>
+            <div class="winamp-menu-item checked" id="menu-item-loudness">Fletcher-Munson Loudness</div>
+            <div class="winamp-menu-item checked" id="menu-item-replaygain">ReplayGain (Peak-clamped)</div>
+          </div>
+        </div>
+
+        <div class="winamp-menu-item has-submenu" id="menu-root-help">
+          <span>Help</span>
+          <div class="winamp-submenu">
+            <div class="winamp-menu-item" id="menu-item-prefs">Preferences… [Ctrl+P]</div>
+            <div class="winamp-menu-item" id="menu-item-shortcuts">Keyboard shortcuts</div>
+            <div class="winamp-menu-divider"></div>
+            <div class="winamp-menu-item" id="menu-item-about">About Surmuni</div>
           </div>
         </div>
       </div>

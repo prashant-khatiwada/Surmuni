@@ -32,6 +32,45 @@ fn download_skin_bytes(url: &str) -> Result<Vec<u8>, String> {
     Ok(bytes)
 }
 
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
+pub struct PlatformInfo {
+    pub os: String,
+    pub is_wayland: bool,
+    pub detached_supported: bool,
+}
+
+#[tauri::command]
+pub fn get_platform_info() -> PlatformInfo {
+    #[cfg(target_os = "linux")]
+    let is_wayland = std::env::var("WAYLAND_DISPLAY").map(|v| !v.is_empty()).unwrap_or(false);
+    #[cfg(not(target_os = "linux"))]
+    let is_wayland = false;
+
+    let os = if cfg!(target_os = "macos") {
+        "macos"
+    } else if cfg!(target_os = "windows") {
+        "windows"
+    } else {
+        "linux"
+    };
+
+    PlatformInfo {
+        os: os.to_string(),
+        is_wayland,
+        detached_supported: !is_wayland,
+    }
+}
+
+#[tauri::command]
+pub fn app_set_window_size(window: tauri::Window, width: f64, height: f64) {
+    let _ = window.set_size(tauri::Size::Logical(tauri::LogicalSize { width, height }));
+}
+
+#[tauri::command]
+pub fn app_set_always_on_top(window: tauri::Window, always_on_top: bool) {
+    let _ = window.set_always_on_top(always_on_top);
+}
+
 #[tauri::command]
 pub fn app_minimize(window: tauri::Window) {
     let _ = window.minimize();

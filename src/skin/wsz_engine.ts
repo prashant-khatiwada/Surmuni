@@ -163,6 +163,29 @@ export class WszSkinEngine {
         background: transparent !important;
       }
 
+      /* Clutterbar: (10, 22) -> top: 8px from main-body, left: 10px, width: 8px, height: 43px */
+      .winamp-container.skin-wsz .clutterbar {
+        position: absolute !important;
+        left: 10px !important;
+        top: 8px !important;
+        width: 8px !important;
+        height: 43px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+        z-index: 10 !important;
+      }
+
+      .winamp-container.skin-wsz .clutter-btn {
+        width: 8px !important;
+        height: 8.6px !important;
+        background: transparent !important;
+        border: none !important;
+        color: transparent !important;
+        cursor: pointer !important;
+        padding: 0 !important;
+      }
+
       /* Display Area: top LCD screen */
       .winamp-container.skin-wsz .main-window .display-area {
         position: absolute !important;

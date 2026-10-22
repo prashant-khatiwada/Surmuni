@@ -89,6 +89,9 @@ pub fn run() {
             read_track_tags,
             write_track_tags,
             fetch_stream_title,
+            get_platform_info,
+            app_set_window_size,
+            app_set_always_on_top,
             app_minimize,
             app_close,
             app_start_dragging

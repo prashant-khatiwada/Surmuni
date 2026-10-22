@@ -19,6 +19,9 @@ let isSeeking = false;
 let timeModeElapsed = true;
 let isMono = false;
 let currentSkin = "skin-classic";
+let currentScale: 1 | 2 | 3 = 1;
+let isAlwaysOnTop = false;
+let isWayland = false;
 
 // DOM Elements
 const appContainer = document.getElementById("app") as HTMLElement;
@@ -173,23 +176,103 @@ const equalizer = new EqualizerManager(
 
 // Magnetic Snapping & Detachable Windows setup
 document.querySelectorAll<HTMLElement>(".winamp-window").forEach((winEl) => {
-  MagneticDockEngine.enableSnapping(winEl, appContainer, () => {
-    invoke("app_start_dragging").catch(() => appWindow.startDragging());
-  });
+  MagneticDockEngine.enableSnapping(
+    winEl,
+    appContainer,
+    () => {
+      invoke("app_start_dragging").catch(() => appWindow.startDragging());
+    },
+    () => {
+      saveSessionState();
+    }
+  );
 });
 
+// Fit Tauri OS Window to the exact docked vertical stack or detached canvas bounds
+async function fitWindowToDockedStack() {
+  if (MagneticDockEngine.isDetachedMode) {
+    // In detached mode, provide ample canvas
+    const detachedW = 1024 * currentScale;
+    const detachedH = 768 * currentScale;
+    try {
+      await invoke("app_set_window_size", { width: detachedW, height: detachedH });
+    } catch {
+      await appWindow.setSize({ type: "Logical", width: detachedW, height: detachedH } as any).catch(() => {});
+    }
+    return;
+  }
+
+  // Calculate exact pixel dimensions of the docked stack
+  const baseW = 275;
+  let totalH = mainWindow.classList.contains("windowshade") ? 14 : 116;
+
+  if (eqWindow && eqWindow.style.display !== "none") {
+    totalH += eqWindow.classList.contains("windowshade") ? 14 : 116;
+  }
+  if (plWindow && plWindow.style.display !== "none") {
+    totalH += plWindow.offsetHeight || 116;
+  }
+  if (mlWindow && mlWindow.style.display !== "none") {
+    totalH += mlWindow.offsetHeight || 200;
+  }
+  if (milkdropWindow && milkdropWindow.style.display !== "none") {
+    totalH += milkdropWindow.offsetHeight || 240;
+  }
+
+  const targetW = Math.max(baseW * currentScale, 275);
+  const targetH = Math.max(totalH * currentScale, 116);
+
+  try {
+    await invoke("app_set_window_size", { width: targetW, height: targetH });
+  } catch {
+    await appWindow.setSize({ type: "Logical", width: targetW, height: targetH } as any).catch(() => {});
+  }
+}
+
+function setAppScale(scale: 1 | 2 | 3) {
+  currentScale = scale;
+  appContainer.classList.remove("scale-1x", "scale-2x", "scale-3x");
+  appContainer.classList.add(`scale-${scale}x`);
+
+  // Update checkmarks in Main Menu
+  document.getElementById("menu-scale-1x")?.classList.toggle("checked", scale === 1);
+  document.getElementById("menu-scale-2x")?.classList.toggle("checked", scale === 2);
+  document.getElementById("menu-scale-3x")?.classList.toggle("checked", scale === 3);
+
+  fitWindowToDockedStack();
+  saveSessionState();
+}
+
+async function setAlwaysOnTop(ontop: boolean) {
+  isAlwaysOnTop = ontop;
+  try {
+    await invoke("app_set_always_on_top", { alwaysOnTop: ontop });
+  } catch {
+    await appWindow.setAlwaysOnTop(ontop).catch(() => {});
+  }
+  document.getElementById("menu-item-toggle-ontop")?.classList.toggle("checked", ontop);
+  document.getElementById("clutter-a")?.classList.toggle("active", ontop);
+}
+
 function toggleWindowDetachedMode(detached: boolean) {
+  if (isWayland && detached) {
+    alert("Detached windows are disabled under Wayland compositors (Wayland protocol prohibits client window positioning).");
+    return;
+  }
+
   MagneticDockEngine.setDetachedMode(detached, appContainer);
+
   // Update radio buttons
   const radios = document.querySelectorAll<HTMLInputElement>("input[name='window-mode']");
   radios.forEach((r) => {
     r.checked = r.value === (detached ? "detached" : "docked");
   });
-  if (detached) {
-    appWindow.setSize({ type: "Logical", width: 1024, height: 768 } as any).catch(() => {});
-  } else {
-    appWindow.setSize({ type: "Logical", width: 500, height: 720 } as any).catch(() => {});
-  }
+
+  // Update Main Menu checkmark
+  document.getElementById("menu-item-toggle-detached")?.classList.toggle("checked", detached);
+
+  fitWindowToDockedStack();
+  saveSessionState();
 }
 
 document.querySelectorAll<HTMLInputElement>("input[name='window-mode']").forEach((radio) => {
@@ -213,6 +296,7 @@ btnMinimize.addEventListener("click", (e) => {
 // Windowshade mode toggle (button or double-clicking main titlebar)
 function toggleWindowshade() {
   mainWindow?.classList.toggle("windowshade");
+  fitWindowToDockedStack();
 }
 
 btnShade?.addEventListener("click", (e) => {
@@ -297,9 +381,198 @@ function togglePreferences() {
   prefsWindow.style.display = isHidden ? "flex" : "none";
 }
 
+// Clutterbar O A I D V Actions
+const clutterO = document.getElementById("clutter-o");
+const clutterA = document.getElementById("clutter-a");
+const clutterI = document.getElementById("clutter-i");
+const clutterD = document.getElementById("clutter-d");
+const clutterV = document.getElementById("clutter-v");
+
+clutterO?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const rect = clutterO.getBoundingClientRect();
+  openMainMenu(rect.left, rect.bottom + 2);
+});
+
+clutterA?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  setAlwaysOnTop(!isAlwaysOnTop);
+});
+
+clutterI?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (playlist.currentTrack) {
+    openTagEditor(playlist.currentTrack);
+  } else if (playlist.length > 0) {
+    openTagEditor(playlist.items[0]);
+  }
+});
+
+clutterD?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  setAppScale(currentScale === 2 ? 1 : 2);
+});
+
+// Cycle visualizer mode (0 = Spectrum, 1 = Oscilloscope, 2 = VU Meter, 3 = Off)
+clutterV?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  visualizer.mode = (visualizer.mode + 1) % 4;
+});
+
+// Winamp Classic Cascading Main Menu
+const winampMainMenu = document.getElementById("winamp-main-menu") as HTMLElement;
+
+function openMainMenu(x: number, y: number) {
+  if (!winampMainMenu) return;
+  winampMainMenu.style.left = `${Math.max(0, Math.min(x, window.innerWidth - 180))}px`;
+  winampMainMenu.style.top = `${Math.max(0, Math.min(y, window.innerHeight - 240))}px`;
+  winampMainMenu.style.display = "block";
+}
+
+function closeMainMenu() {
+  if (winampMainMenu) {
+    winampMainMenu.style.display = "none";
+  }
+}
+
+// Right-click on Main Window titlebar or empty chassis opens Main Menu
+mainWindow?.addEventListener("contextmenu", (e) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest("button") && !target.closest("input") && !target.closest("select")) {
+    e.preventDefault();
+    openMainMenu(e.clientX, e.clientY);
+  }
+});
+
+// Bolt icon also opens Main Menu (classic Winamp behavior)
+btnPrefIcon?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const rect = btnPrefIcon.getBoundingClientRect();
+  openMainMenu(rect.left, rect.bottom + 4);
+});
+
+// Gear preferences button
 btnPrefs?.addEventListener("click", togglePreferences);
-btnPrefIcon?.addEventListener("click", togglePreferences);
 btnPrefsClose?.addEventListener("click", () => { prefsWindow.style.display = "none"; });
+
+// Dismiss main menu when clicking anywhere outside
+window.addEventListener("click", (e) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest("#winamp-main-menu") && !target.closest("#clutter-o") && !target.closest("#btn-pref-icon")) {
+    closeMainMenu();
+  }
+});
+
+// Wire Main Menu Items
+document.getElementById("menu-item-play")?.addEventListener("click", () => { btnPlay.click(); closeMainMenu(); });
+document.getElementById("menu-item-pause")?.addEventListener("click", () => { AudioService.pause(); setPlayPauseUI(false); closeMainMenu(); });
+document.getElementById("menu-item-stop")?.addEventListener("click", () => { btnStop.click(); closeMainMenu(); });
+document.getElementById("menu-item-prev")?.addEventListener("click", () => { btnPrev.click(); closeMainMenu(); });
+document.getElementById("menu-item-next")?.addEventListener("click", () => { btnNext.click(); closeMainMenu(); });
+document.getElementById("menu-item-open-file")?.addEventListener("click", () => { handleAddFiles(); closeMainMenu(); });
+document.getElementById("menu-item-open-url")?.addEventListener("click", () => { handleAddUrl(); closeMainMenu(); });
+document.getElementById("menu-item-clear-pl")?.addEventListener("click", () => { btnClearPl.click(); closeMainMenu(); });
+document.getElementById("menu-item-quit")?.addEventListener("click", () => { invoke("app_close").catch(() => appWindow.close()); });
+
+document.getElementById("menu-scale-1x")?.addEventListener("click", () => { setAppScale(1); closeMainMenu(); });
+document.getElementById("menu-scale-2x")?.addEventListener("click", () => { setAppScale(2); closeMainMenu(); });
+document.getElementById("menu-scale-3x")?.addEventListener("click", () => { setAppScale(3); closeMainMenu(); });
+
+document.getElementById("menu-vis-spectrum")?.addEventListener("click", () => { visualizer.mode = 0; closeMainMenu(); });
+document.getElementById("menu-vis-oscilloscope")?.addEventListener("click", () => { visualizer.mode = 1; closeMainMenu(); });
+document.getElementById("menu-vis-vu")?.addEventListener("click", () => { visualizer.mode = 2; closeMainMenu(); });
+document.getElementById("menu-vis-milkdrop")?.addEventListener("click", () => { btnVisToggle.click(); closeMainMenu(); });
+document.getElementById("menu-vis-off")?.addEventListener("click", () => { visualizer.mode = 3; closeMainMenu(); });
+
+document.getElementById("menu-item-shade")?.addEventListener("click", () => { toggleWindowshade(); closeMainMenu(); });
+document.getElementById("menu-item-toggle-eq")?.addEventListener("click", () => { btnEqToggle.click(); closeMainMenu(); });
+document.getElementById("menu-item-toggle-pl")?.addEventListener("click", () => { btnPlToggle.click(); closeMainMenu(); });
+document.getElementById("menu-item-toggle-detached")?.addEventListener("click", () => {
+  toggleWindowDetachedMode(!MagneticDockEngine.isDetachedMode);
+  closeMainMenu();
+});
+document.getElementById("menu-item-toggle-ontop")?.addEventListener("click", () => {
+  setAlwaysOnTop(!isAlwaysOnTop);
+  closeMainMenu();
+});
+document.getElementById("menu-item-change-skin")?.addEventListener("click", () => { openSkinMuseum(); closeMainMenu(); });
+
+document.getElementById("menu-item-crossfade")?.addEventListener("click", () => {
+  const cur = parseFloat(prefCrossfadeSlider?.value || "2");
+  const next = cur > 0 ? 0 : 2.0;
+  if (prefCrossfadeSlider) prefCrossfadeSlider.value = next.toString();
+  if (prefCrossfadeVal) prefCrossfadeVal.innerText = `${next.toFixed(1)}s`;
+  AudioService.setCrossfade(next);
+  closeMainMenu();
+});
+document.getElementById("menu-item-mono")?.addEventListener("click", () => {
+  isMono = !isMono;
+  AudioService.setMono(isMono);
+  specStereo?.classList.toggle("active", !isMono);
+  specMono?.classList.toggle("active", isMono);
+  closeMainMenu();
+});
+document.getElementById("menu-item-loudness")?.addEventListener("click", () => {
+  const item = document.getElementById("menu-item-loudness");
+  item?.classList.toggle("checked");
+  closeMainMenu();
+});
+document.getElementById("menu-item-replaygain")?.addEventListener("click", () => {
+  const item = document.getElementById("menu-item-replaygain");
+  item?.classList.toggle("checked");
+  closeMainMenu();
+});
+
+document.getElementById("menu-item-prefs")?.addEventListener("click", () => { togglePreferences(); closeMainMenu(); });
+document.getElementById("menu-item-shortcuts")?.addEventListener("click", () => {
+  alert("Surmuni Keyboard Shortcuts:\n\n" +
+    "Space / X: Play / Pause\n" +
+    "C: Pause\n" +
+    "V: Stop\n" +
+    "Z: Previous Track\n" +
+    "B: Next Track\n" +
+    "J / F3: Jump to File\n" +
+    "I: File Info / Tag Editor\n" +
+    "Alt+D: Detached Windows\n" +
+    "Ctrl+D: 2× Double Size\n" +
+    "Ctrl+A: Always on Top\n" +
+    "Alt+G: Toggle Equalizer\n" +
+    "Alt+E: Toggle Playlist\n" +
+    "Ctrl+Shift+K: MilkDrop 2 Visualizer\n" +
+    "Ctrl+P: Preferences\n" +
+    "Ctrl+L: Open Audio Stream URL\n" +
+    "Ctrl+Z: Undo Playlist Action\n" +
+    "Del / Backspace: Remove Selected Track\n" +
+    "Esc: Cancel background folder scan");
+  closeMainMenu();
+});
+document.getElementById("menu-item-about")?.addEventListener("click", () => {
+  alert("Surmuni v1.2.0\nAuthentic, Bit-Perfect Winamp 2.x Experience\nDesktop parity with OneAmp & Classic Winamp\n\nBuilt with Rust, Tauri v2 & Web Audio API.\nLicensed under GNU GPLv3.");
+  closeMainMenu();
+});
+
+// Platform detection initialization
+async function initPlatformDetection() {
+  try {
+    const info = await invoke<{ os: string; is_wayland: boolean; detached_supported: boolean }>("get_platform_info");
+    isWayland = info.is_wayland;
+    MagneticDockEngine.isDetachedSupported = info.detached_supported;
+
+    if (!info.detached_supported) {
+      const detachedMenuItem = document.getElementById("menu-item-toggle-detached");
+      if (detachedMenuItem) {
+        detachedMenuItem.classList.add("disabled");
+        detachedMenuItem.innerText = "Detached windows (disabled on Wayland)";
+        detachedMenuItem.title = "Wayland compositors prohibit client-side window positioning";
+      }
+    }
+  } catch (err) {
+    console.warn("Could not query platform info:", err);
+  }
+}
+
+initPlatformDetection();
+
 btnPrefsOk?.addEventListener("click", () => { prefsWindow.style.display = "none"; });
 
 // Preferences Tabs
@@ -361,6 +634,12 @@ function syncToggleButtons() {
   btnPlToggle?.classList.toggle("active", plWindow?.style.display !== "none");
   btnMlToggle?.classList.toggle("active", mlWindow?.style.display !== "none");
   btnVisToggle?.classList.toggle("active", milkdropWindow?.style.display !== "none");
+
+  // Sync menu checkmarks
+  document.getElementById("menu-item-toggle-eq")?.classList.toggle("checked", eqWindow?.style.display !== "none");
+  document.getElementById("menu-item-toggle-pl")?.classList.toggle("checked", plWindow?.style.display !== "none");
+
+  fitWindowToDockedStack();
 }
 
 // Window Toggles & Close handlers
@@ -946,6 +1225,22 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
     toggleWindowDetachedMode(!MagneticDockEngine.isDetachedMode);
   }
+  else if ((e.ctrlKey || e.metaKey) && key === "d") {
+    e.preventDefault();
+    setAppScale(currentScale === 2 ? 1 : 2);
+  }
+  else if ((e.ctrlKey || e.metaKey) && key === "a") {
+    e.preventDefault();
+    setAlwaysOnTop(!isAlwaysOnTop);
+  }
+  else if (e.altKey && key === "g") {
+    e.preventDefault();
+    btnEqToggle.click();
+  }
+  else if (e.altKey && key === "e") {
+    e.preventDefault();
+    btnPlToggle.click();
+  }
   else if ((e.ctrlKey || e.metaKey) && key === "z") {
     e.preventDefault();
     if (playlist.undo()) {
@@ -995,6 +1290,8 @@ function saveSessionState() {
       volume: parseFloat(volumeSlider.value) || 80,
       balance: parseFloat(balanceSlider.value) || 0,
       isMono,
+      scale: currentScale,
+      isAlwaysOnTop,
       isShuffle: playlist.isShuffle,
       isRepeat: playlist.isRepeat,
       isDetached: MagneticDockEngine.isDetachedMode,
@@ -1048,9 +1345,15 @@ async function restoreSessionState(): Promise<boolean> {
       syncToggleButtons();
     }
 
-    // 3. Detached vs Docked Mode
+    // 3. Detached vs Docked Mode & Scaling
+    if (session.scale && (session.scale === 1 || session.scale === 2 || session.scale === 3)) {
+      setAppScale(session.scale);
+    }
     if (session.isDetached) {
       toggleWindowDetachedMode(true);
+    }
+    if (session.isAlwaysOnTop) {
+      setAlwaysOnTop(true);
     }
 
     // 4. Playlist Tracks & Missing File Verification

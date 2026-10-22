@@ -2075,3 +2075,135 @@ html, body {
   font-size: 11px;
   font-weight: 800;
 }
+
+/* ========================================================================== */
+/* CLUTTERBAR (O A I D V) & AUTHENTIC WINAMP CASCADING MENU                   */
+/* ========================================================================== */
+.clutterbar {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  width: 8px;
+  z-index: 15;
+}
+
+.clutter-btn {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  background: #2a2a35;
+  color: #888;
+  font-family: monospace;
+  font-size: 6px;
+  line-height: 8px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 1px;
+}
+
+.clutter-btn:hover {
+  background: #00aa44;
+  color: #fff;
+}
+
+.clutter-btn:active {
+  background: #00ff66;
+  color: #000;
+}
+
+/* Authentic Winamp Menu popup */
+.winamp-menu-popup {
+  position: absolute;
+  z-index: 10000;
+  background: #141414;
+  border: 1px solid #78c850;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
+  font-family: Arial, -apple-system, sans-serif;
+  font-size: 11px;
+  color: #dcdcdc;
+  min-width: 145px;
+  user-select: none;
+  padding: 2px 0;
+}
+
+.winamp-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 20px 3px 22px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.winamp-menu-item:hover {
+  background: #285028;
+  color: #ffffff;
+}
+
+.winamp-menu-item.checked::before {
+  content: "✓";
+  position: absolute;
+  left: 6px;
+  color: #00dc50;
+  font-weight: bold;
+}
+
+.winamp-menu-item.has-submenu::after {
+  content: "▸";
+  position: absolute;
+  right: 6px;
+  color: #b4dcb4;
+  font-size: 10px;
+}
+
+.winamp-menu-divider {
+  height: 1px;
+  background: #333333;
+  margin: 3px 4px;
+}
+
+.winamp-submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: -2px;
+  background: #141414;
+  border: 1px solid #78c850;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
+  min-width: 155px;
+  padding: 2px 0;
+  z-index: 10001;
+}
+
+.winamp-menu-item:hover > .winamp-submenu {
+  display: block;
+}
+
+.winamp-menu-item.disabled {
+  color: #666 !important;
+  cursor: not-allowed !important;
+}
+
+.winamp-menu-item.disabled:hover {
+  background: transparent !important;
+}
+
+/* Integer Scaling Rules */
+.winamp-container.scale-1x {
+  transform: none;
+}
+
+.winamp-container.scale-2x {
+  transform: scale(2);
+  transform-origin: top left;
+}
+
+.winamp-container.scale-3x {
+  transform: scale(3);
+  transform-origin: top left;
+}
