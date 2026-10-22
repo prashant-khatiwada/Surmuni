@@ -82,6 +82,39 @@ pub fn app_close(window: tauri::Window) {
 }
 
 #[tauri::command]
+pub fn app_open_preferences(app: tauri::AppHandle) -> Result<(), String> {
+    use tauri::Manager;
+    if let Some(pref_window) = app.get_webview_window("preferences") {
+        let _ = pref_window.show();
+        let _ = pref_window.unminimize();
+        let _ = pref_window.set_focus();
+    } else {
+        // Fallback create if closed
+        let _ = tauri::WebviewWindowBuilder::new(
+            &app,
+            "preferences",
+            tauri::WebviewUrl::App("preferences.html".into())
+        )
+        .title("Surmuni Preferences")
+        .inner_size(560.0, 440.0)
+        .min_inner_size(500.0, 380.0)
+        .resizable(true)
+        .decorations(true)
+        .build();
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn app_close_preferences(app: tauri::AppHandle) -> Result<(), String> {
+    use tauri::Manager;
+    if let Some(pref_window) = app.get_webview_window("preferences") {
+        let _ = pref_window.hide();
+    }
+    Ok(())
+}
+
+#[tauri::command]
 pub fn app_start_dragging(window: tauri::Window) {
     let _ = window.start_dragging();
 }

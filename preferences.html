@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Surmuni Preferences</title>
+    <link rel="stylesheet" href="/src/preferences.css" />
+  </head>
+  <body>
+    <div class="pref-shell">
+      <!-- Sidebar Categories -->
+      <aside class="pref-sidebar">
+        <div class="pref-branding">
+          <div class="pref-logo-badge">⚡ SURMUNI</div>
+          <div class="pref-logo-sub">PREFERENCES</div>
+        </div>
+        <nav class="pref-nav">
+          <button class="pref-nav-btn active" data-tab="tab-skins">
+            <span class="nav-icon">🎨</span>
+            <span class="nav-label" data-i18n="tab_skins">Skins & Themes</span>
+          </button>
+          <button class="pref-nav-btn" data-tab="tab-audio">
+            <span class="nav-icon">🎛️</span>
+            <span class="nav-label" data-i18n="tab_audio">Audio & DSP</span>
+          </button>
+          <button class="pref-nav-btn" data-tab="tab-language">
+            <span class="nav-icon">🌐</span>
+            <span class="nav-label" data-i18n="tab_language">Language (भाषा)</span>
+          </button>
+          <button class="pref-nav-btn" data-tab="tab-shortcuts">
+            <span class="nav-icon">⌨️</span>
+            <span class="nav-label" data-i18n="tab_keyboard">Shortcuts</span>
+          </button>
+          <button class="pref-nav-btn" data-tab="tab-about">
+            <span class="nav-icon">ℹ️</span>
+            <span class="nav-label" data-i18n="tab_about">About</span>
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Main Content Panel -->
+      <main class="pref-main">
+        <!-- Tab 1: Skins & Themes -->
+        <section class="pref-pane active" id="tab-skins">
+          <h2 class="pane-title" data-i18n="tab_skins">Skins & Visual Themes</h2>
+          
+          <div class="pref-group">
+            <h3 class="group-title">Window Layout Mode</h3>
+            <div class="radio-card-grid">
+              <label class="radio-card">
+                <input type="radio" name="window-mode" value="docked" checked />
+                <div class="card-content">
+                  <strong class="card-title">Docked Stack (Single Unit)</strong>
+                  <span class="card-desc">Classic Winamp 2.x unified chassis pinned to 275px geometry.</span>
+                </div>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="window-mode" value="detached" />
+                <div class="card-content">
+                  <strong class="card-title">Detached Windows (Alt+D)</strong>
+                  <span class="card-desc">Magnetic snap physics (12px threshold) with transitive group dragging.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="pref-group">
+            <h3 class="group-title" data-i18n="installed_skins">Installed Themes</h3>
+            <div class="theme-list">
+              <label class="theme-item">
+                <input type="radio" name="theme-choice" value="skin-classic" checked />
+                <span class="theme-name">Surmuni Classic (1998 Retro Pixel)</span>
+              </label>
+              <label class="theme-item">
+                <input type="radio" name="theme-choice" value="skin-kathmandu" />
+                <span class="theme-name">Kathmandu (Modern Flat Slate · Crimson & Azure)</span>
+              </label>
+              <label class="theme-item">
+                <input type="radio" name="theme-choice" value="skin-neo2026" />
+                <span class="theme-name">Neo-Surmuni 2026 ✨ (Modern Glass & Glow)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="pref-actions">
+            <button class="btn primary" id="btn-load-wsz" data-i18n="load_wsz">📂 Load Local .WSZ Skin...</button>
+            <button class="btn secondary" id="btn-browse-museum" data-i18n="browse_museum">🌐 Browse Winamp Skin Museum (65k+ Skins)</button>
+          </div>
+        </section>
+
+        <!-- Tab 2: Audio & DSP -->
+        <section class="pref-pane" id="tab-audio">
+          <h2 class="pane-title" data-i18n="dsp_tuning">DSP & Audio Tuning</h2>
+
+          <div class="pref-group">
+            <h3 class="group-title" data-i18n="crossfade_sec">Hardware Crossfade</h3>
+            <div class="slider-row">
+              <input type="range" id="crossfade-slider" min="0" max="8" value="2" step="0.5" />
+              <span class="slider-val" id="crossfade-val">2.0s</span>
+            </div>
+            <p class="field-hint">Linear power fade-out/fade-in between consecutive tracks.</p>
+          </div>
+
+          <div class="pref-group">
+            <h3 class="group-title">Audio DSP Features</h3>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <strong>Smart AutoDJ (Silence Trimming)</strong>
+                <span>Automatically crops lead-in and tail-out silence for seamless transitions.</span>
+              </div>
+              <span class="badge active" data-i18n="autodj_status">Active</span>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <strong data-i18n="replaygain_label">ReplayGain Loudness Leveling</strong>
+                <span>Bit-perfect -14 LUFS normalizer with peak clamping.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-replaygain" checked />
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <strong>Fletcher-Munson Loudness Contour</strong>
+                <span>Equal-loudness psychoacoustic boost at low playback volumes.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-loudness" checked />
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: Language -->
+        <section class="pref-pane" id="tab-language">
+          <h2 class="pane-title" data-i18n="language_heading">Interface Language Selection</h2>
+
+          <div class="pref-group">
+            <label class="group-title" for="lang-select" data-i18n="language_select_label">Select Application Language:</label>
+            <select id="lang-select" class="select-field">
+              <option value="en">English (Default)</option>
+              <option value="ne">नेपाली (Nepali)</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+            </select>
+            <p class="field-hint" style="margin-top: 10px;">
+              Translations update the main player, playlists, equalizers, and preferences in real-time.
+            </p>
+          </div>
+        </section>
+
+        <!-- Tab 4: Shortcuts -->
+        <section class="pref-pane" id="tab-shortcuts">
+          <h2 class="pane-title" data-i18n="keyboard_heading">Global & In-App Keybindings</h2>
+          <div class="table-wrap">
+            <table class="shortcuts-grid">
+              <thead>
+                <tr>
+                  <th>Shortcut</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><kbd>⌘P</kbd> / <kbd>Ctrl+P</kbd></td><td>Open Preferences</td></tr>
+                <tr><td><kbd>⌘D</kbd> / <kbd>Ctrl+D</kbd></td><td>2× Double Size Mode</td></tr>
+                <tr><td><kbd>⌥D</kbd> / <kbd>Alt+D</kbd></td><td>Toggle Detached Windows Mode</td></tr>
+                <tr><td><kbd>⌥G</kbd> / <kbd>Alt+G</kbd></td><td>Toggle Equalizer Window</td></tr>
+                <tr><td><kbd>⌥E</kbd> / <kbd>Alt+E</kbd></td><td>Toggle Playlist Window</td></tr>
+                <tr><td><kbd>Ctrl+L</kbd></td><td>Stream Internet Radio / URL</td></tr>
+                <tr><td><kbd>J</kbd> / <kbd>F3</kbd></td><td>Jump to File (Media Library)</td></tr>
+                <tr><td><kbd>I</kbd></td><td>File Info & ID3 Tag Editor</td></tr>
+                <tr><td><kbd>Ctrl+Shift+K</kbd></td><td>Toggle WebGL MilkDrop 2 Visualizer</td></tr>
+                <tr><td><kbd>Space</kbd> / <kbd>X</kbd></td><td>Play / Pause</td></tr>
+                <tr><td><kbd>V</kbd></td><td>Stop Playback</td></tr>
+                <tr><td><kbd>Z</kbd> / <kbd>B</kbd></td><td>Previous / Next Track</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Tab 5: About -->
+        <section class="pref-pane" id="tab-about">
+          <h2 class="pane-title" data-i18n="about_heading">Surmuni v1.4.0</h2>
+          <div class="about-card">
+            <div class="about-icon">⚡</div>
+            <div class="about-text">
+              <h3>Surmuni High-Fidelity Audio Player</h3>
+              <p data-i18n="about_desc1">High-Performance Retro & Modern Audio Player in Rust + Tauri v2.</p>
+              <p style="margin-top: 8px;">
+                Engineered for bit-perfect audio playback, seamless gapless preloading, 512-pt real-time FFT spectrum analyzer, WebGL MilkDrop 2, and 1:1 classic Winamp 2.x WSZ skin compatibility.
+              </p>
+              <div class="meta-tag">License: GNU General Public License v3 (GPL-3.0-or-later)</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Footer Bar -->
+        <footer class="pref-footer">
+          <button class="btn primary" id="btn-done" data-i18n="btn_close">Close</button>
+        </footer>
+      </main>
+    </div>
+
+    <script type="module" src="/src/preferences.ts"></script>
+  </body>
+</html>

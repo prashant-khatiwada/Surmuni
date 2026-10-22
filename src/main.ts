@@ -416,9 +416,16 @@ museumSearchInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") openSkinMuseum(museumSearchInput.value);
 });
 
-function togglePreferences() {
-  const isHidden = prefsWindow.style.display === "none";
-  prefsWindow.style.display = isHidden ? "flex" : "none";
+async function togglePreferences() {
+  try {
+    await invoke("app_open_preferences");
+  } catch (err) {
+    console.warn("Could not invoke app_open_preferences, falling back to window:", err);
+    if (prefsWindow) {
+      const isHidden = prefsWindow.style.display === "none";
+      prefsWindow.style.display = isHidden ? "flex" : "none";
+    }
+  }
 }
 
 // Retro Dynamic Winamp Micro-Tooltip System
@@ -749,6 +756,38 @@ async function initGlobalMediaKeys() {
   });
   listen("menu-app-prefs", () => {
     togglePreferences();
+  });
+
+  // Listen for sync events from Separate Preferences Window
+  listen<number>("pref-crossfade-change", (e) => {
+    if (prefCrossfadeSlider) prefCrossfadeSlider.value = e.payload.toString();
+    if (prefCrossfadeVal) prefCrossfadeVal.innerText = `${e.payload.toFixed(1)}s`;
+    AudioService.setCrossfade(e.payload);
+  });
+  listen<boolean>("pref-replaygain-change", (e) => {
+    isReplayGainEnabled = e.payload;
+    AudioService.setReplayGain(e.payload);
+  });
+  listen<boolean>("pref-loudness-change", (e) => {
+    isLoudnessEnabled = e.payload;
+    AudioService.setLoudness(e.payload);
+  });
+  listen<boolean>("pref-window-mode-change", (e) => {
+    toggleWindowDetachedMode(e.payload);
+  });
+  listen<string>("pref-skin-change", (e) => {
+    currentSkin = e.payload;
+    appContainer.className = `winamp-container ${currentSkin}`;
+    visualizer.skin = currentSkin;
+  });
+  listen("pref-load-wsz", () => {
+    btnPrefLoadWsz?.click();
+  });
+  listen("pref-browse-museum", () => {
+    openSkinMuseum();
+  });
+  listen<SupportedLang>("pref-lang-change", (e) => {
+    I18nManager.setLang(e.payload);
   });
   listen("menu-app-about", () => {
     alert("Surmuni v1.4.0\nAuthentic, Bit-Perfect Winamp Experience in Rust + Tauri v2.\nLicensed under GNU GPLv3.");

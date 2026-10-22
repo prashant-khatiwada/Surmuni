@@ -23,6 +23,18 @@
         "decorations": false,
         "transparent": true,
         "resizable": true
+      },
+      {
+        "label": "preferences",
+        "title": "Surmuni Preferences",
+        "url": "preferences.html",
+        "width": 560,
+        "height": 440,
+        "minWidth": 500,
+        "minHeight": 380,
+        "decorations": true,
+        "resizable": true,
+        "visible": false
       }
     ],
     "security": {

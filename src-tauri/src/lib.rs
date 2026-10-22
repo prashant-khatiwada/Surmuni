@@ -112,7 +112,9 @@ pub fn run() {
             app_set_always_on_top,
             app_minimize,
             app_close,
-            app_start_dragging
+            app_start_dragging,
+            app_open_preferences,
+            app_close_preferences
         ])
         .setup(move |app| {
             let handle: AppHandle = app.handle().clone();
