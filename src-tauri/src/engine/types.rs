@@ -33,6 +33,7 @@ pub struct EqualizerConfig {
 
 pub enum AudioCommand {
     Play(String),
+    PreloadNext(String),
     Pause,
     Resume,
     Stop,

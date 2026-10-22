@@ -818,6 +818,15 @@ async function playIndex(idx: number) {
     equalizer.autoLoadForTrack(meta.path);
     notifyTrackChange(meta);
     saveSessionState();
+
+    // Gapless Lookahead: Preload next track in queue/order
+    const nextIdx = playlist.getNextIndex();
+    if (nextIdx !== null && nextIdx < playlist.items.length) {
+      const nextTrack = playlist.items[nextIdx];
+      if (nextTrack && !nextTrack.path.startsWith("http")) {
+        AudioService.preloadNext(nextTrack.path);
+      }
+    }
   }
 }
 

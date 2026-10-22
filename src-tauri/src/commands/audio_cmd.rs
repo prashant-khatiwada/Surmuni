@@ -14,6 +14,11 @@ pub fn play_track(state: State<'_, AppState>, path: String) -> Result<TrackMetad
 }
 
 #[tauri::command]
+pub fn preload_next_track(state: State<'_, AppState>, path: String) {
+    let _ = state.cmd_tx.send(AudioCommand::PreloadNext(path));
+}
+
+#[tauri::command]
 pub fn pause_track(state: State<'_, AppState>) {
     let _ = state.cmd_tx.send(AudioCommand::Pause);
 }

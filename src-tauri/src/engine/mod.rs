@@ -42,6 +42,7 @@ pub fn start_audio_engine(
 
         let mut current_sink: Option<Sink> = None;
         let mut fading_sink: Option<Sink> = None;
+        let mut preloaded_next: Option<(String, Sink)> = None;
         let mut current_path: Option<String> = None;
         let mut current_volume: f32 = 0.8;
         let mut crossfade_secs: f32 = 2.0;
@@ -61,6 +62,32 @@ pub fn start_audio_engine(
             while let Ok(cmd) = rx.try_recv() {
                 match cmd {
                     AudioCommand::Play(path) => {
+                        // Check if we already have this track preloaded for seamless gapless playback
+                        if let Some((pre_path, pre_sink)) = preloaded_next.take() {
+                            if pre_path == path {
+                                if let Some(old) = current_sink.take() {
+                                    old.stop();
+                                }
+                                pre_sink.set_volume(current_volume);
+                                pre_sink.play();
+                                current_sink = Some(pre_sink);
+                                current_path = Some(path.clone());
+
+                                let duration = extract_metadata(&path)
+                                    .map(|m| m.duration_secs)
+                                    .unwrap_or(0.0);
+
+                                let mut s = status.lock().unwrap();
+                                s.is_playing = true;
+                                s.is_paused = false;
+                                s.duration = duration;
+                                s.position = 0.0;
+                                continue;
+                            } else {
+                                pre_sink.stop();
+                            }
+                        }
+
                         // Hardware crossfade: fade out previous sink instead of abruptly killing it
                         if let Some(old) = current_sink.take() {
                             if crossfade_secs > 0.0 {
@@ -311,6 +338,34 @@ pub fn start_audio_engine(
                     }
                     AudioCommand::SetReplayGain(enabled) => {
                         *dsp_replaygain.lock().unwrap() = enabled;
+                    }
+                    AudioCommand::PreloadNext(path) => {
+                        // Preload next track decoder paused at sample 0 for true gapless transition
+                        if let Some((_, old_pre)) = preloaded_next.take() {
+                            old_pre.stop();
+                        }
+                        if let Ok(file) = File::open(&path) {
+                            let reader = BufReader::new(file);
+                            if let Ok(source) = Decoder::new(reader) {
+                                let replay_gain = extract_metadata(&path).ok().and_then(|m| m.replay_gain_db);
+                                let dsp_source = DspSource::new(
+                                    source.convert_samples(),
+                                    Arc::clone(&dsp_balance),
+                                    Arc::clone(&dsp_mono),
+                                    Arc::clone(&dsp_eq),
+                                    replay_gain,
+                                    Arc::clone(&dsp_loudness),
+                                    Arc::clone(&dsp_replaygain),
+                                    Arc::clone(&dsp_fft_buffer),
+                                );
+                                if let Ok(sink) = Sink::try_new(&stream_handle) {
+                                    sink.pause();
+                                    sink.set_volume(current_volume);
+                                    sink.append(dsp_source);
+                                    preloaded_next = Some((path, sink));
+                                }
+                            }
+                        }
                     }
                 }
             }

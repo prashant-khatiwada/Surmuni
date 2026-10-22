@@ -71,6 +71,7 @@ pub fn run() {
         .manage(app_state)
         .invoke_handler(tauri::generate_handler![
             play_track,
+            preload_next_track,
             pause_track,
             resume_track,
             stop_track,

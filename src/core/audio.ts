@@ -8,6 +8,10 @@ export class AudioService {
     return await invoke<TrackMetadata>("play_track", { path });
   }
 
+  static async preloadNext(path: string): Promise<void> {
+    await invoke("preload_next_track", { path });
+  }
+
   static async pause(): Promise<void> {
     await invoke("pause_track");
   }
