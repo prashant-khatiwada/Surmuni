@@ -1,5 +1,8 @@
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { listen } from "@tauri-apps/api/event";
+import { register, unregisterAll } from "@tauri-apps/plugin-global-shortcut";
+import { sendNotification } from "@tauri-apps/plugin-notification";
 import { AudioService } from "./core/audio";
 import { PlaylistManager } from "./core/playlist";
 import { TrackMetadata } from "./core/types";
@@ -558,6 +561,85 @@ document.getElementById("menu-item-about")?.addEventListener("click", () => {
   closeMainMenu();
 });
 
+// Retro In-App Toast System
+let toastContainer: HTMLElement | null = null;
+
+function showRetroToast(message: string, durationMs = 2800) {
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.className = "retro-toast-container";
+    document.body.appendChild(toastContainer);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "retro-toast";
+  toast.textContent = message;
+  toastContainer.appendChild(toast);
+
+  // Trigger smooth slide in
+  requestAnimationFrame(() => {
+    toast.classList.add("visible");
+  });
+
+  setTimeout(() => {
+    toast.classList.remove("visible");
+    setTimeout(() => {
+      toast.remove();
+    }, 250);
+  }, durationMs);
+}
+
+// OS Notification + In-App Toast for Track Changes
+function notifyTrackChange(track: TrackMetadata) {
+  const title = I18nManager.t("now_playing");
+  const body = `${track.artist} - ${track.title}`;
+  showRetroToast(`♫ ${body}`);
+
+  try {
+    sendNotification({
+      title,
+      body,
+    });
+  } catch (err) {
+    console.debug("Desktop notification error:", err);
+  }
+}
+
+// Global Media Keys & IPC Listeners from System Tray
+async function initGlobalMediaKeys() {
+  // Listen for Tray IPC events
+  listen("media-key-play-pause", () => {
+    btnPlay.click();
+  });
+  listen("media-key-next", () => {
+    btnNext.click();
+  });
+  listen("media-key-prev", () => {
+    btnPrev.click();
+  });
+
+  // Register Global OS Media Shortcuts
+  try {
+    await unregisterAll().catch(() => {});
+    await register("MediaPlayPause", (event) => {
+      if (event.state === "Pressed") btnPlay.click();
+    });
+    await register("MediaTrackNext", (event) => {
+      if (event.state === "Pressed") btnNext.click();
+    });
+    await register("MediaTrackPrevious", (event) => {
+      if (event.state === "Pressed") btnPrev.click();
+    });
+    await register("MediaStop", (event) => {
+      if (event.state === "Pressed") btnStop.click();
+    });
+  } catch (err) {
+    console.debug("Global shortcut registration notice:", err);
+  }
+}
+
+initGlobalMediaKeys();
+
 // Platform detection initialization
 async function initPlatformDetection() {
   try {
@@ -734,6 +816,7 @@ async function playIndex(idx: number) {
     visualizer.isPlaying = true;
     setPlayPauseUI(true);
     equalizer.autoLoadForTrack(meta.path);
+    notifyTrackChange(meta);
     saveSessionState();
   }
 }
@@ -874,8 +957,9 @@ btnTagSave?.addEventListener("click", async () => {
     }
     renderPlaylistView();
     tagWindow.style.display = "none";
+    showRetroToast(I18nManager.t("toast_tags_saved"));
   } catch (err) {
-    alert("Failed to save tags: " + err);
+    showRetroToast("Failed to save tags: " + err, 4000);
   }
 });
 

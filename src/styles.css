@@ -2207,3 +2207,35 @@ html, body {
   transform: scale(3);
   transform-origin: top left;
 }
+
+/* Retro Winamp-Styled In-App Toast Overlay */
+.retro-toast-container {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 999999;
+  pointer-events: none;
+}
+
+.retro-toast {
+  background: #141414;
+  color: #00ff00;
+  border: 1px solid #78c850;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
+  padding: 6px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  border-radius: 2px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: auto;
+}
+
+.retro-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

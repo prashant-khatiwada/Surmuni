@@ -33,6 +33,10 @@ export interface Translations {
   btn_shuffle_pl: string;
   btn_load_pl: string;
   btn_save_pl: string;
+  now_playing: string;
+  toast_tags_saved: string;
+  toast_copied: string;
+  toast_drop_scan: string;
 }
 
 export const translations: Record<SupportedLang, Translations> = {
@@ -55,7 +59,7 @@ export const translations: Record<SupportedLang, Translations> = {
     language_heading: "Interface Language Selection",
     language_select_label: "Select Application Language:",
     keyboard_heading: "Global Keybindings & Hotkeys",
-    about_heading: "Surmuni v1.0",
+    about_heading: "Surmuni v1.4.0",
     about_desc1: "High-Performance Retro & Modern Audio Player in Rust + Tauri v2.",
     about_desc2: "Zero telemetry. Ultra-low footprint. 100% offline playback support for MP3, FLAC, OGG, MIDI, and Chiptunes.",
     btn_close: "CLOSE",
@@ -66,14 +70,18 @@ export const translations: Record<SupportedLang, Translations> = {
     btn_shuffle_pl: "⚡ SHUFFLE",
     btn_load_pl: "📂 LOAD",
     btn_save_pl: "💾 SAVE",
+    now_playing: "Now Playing",
+    toast_tags_saved: "Audio tags successfully saved to file!",
+    toast_copied: "Copied to clipboard!",
+    toast_drop_scan: "Scanning dropped files in background (Esc to cancel)...",
   },
   ne: {
-    prefs_title: "भोल्टएम्प प्राथमिकताहरू [Ctrl+P]",
+    prefs_title: "सुर्मुनि प्राथमिकताहरू [Ctrl+P]",
     tab_skins: "स्किन तथा थिमहरू",
     tab_audio: "अडियो तथा क्रसफेड",
     tab_language: "भाषा (Language)",
     tab_keyboard: "किबोर्ड सर्टकटहरू",
-    tab_about: "भोल्टएम्प बारे",
+    tab_about: "सुर्मुनि बारे",
     installed_skins: "उपलब्ध थिम तथा स्किनहरू",
     load_wsz: "📂 स्थानीय .WSZ स्किन लोड गर्नुहोस्...",
     browse_museum: "🌐 स्किन संग्रहालय (६५,०००+ स्किन)",
@@ -86,25 +94,29 @@ export const translations: Record<SupportedLang, Translations> = {
     language_heading: "इन्टरफेस भाषा छनौट",
     language_select_label: "एपको भाषा चयन गर्नुहोस्:",
     keyboard_heading: "ग्लोबल किबोर्ड सर्टकटहरू",
-    about_heading: "भोल्टएम्प संस्करण १.०",
+    about_heading: "सुर्मुनि संस्करण १.४.०",
     about_desc1: "रस्ट तथा टाउरी v2 मा निर्मित उच्च-गतिको अडियो प्लेयर।",
     about_desc2: "कुनै ट्र्याकिङ छैन। न्यून मेमोरी। MP3, FLAC, OGG, MIDI तथा Chiptune को लागि पूर्ण अफलाइन समर्थन।",
     btn_close: "बन्द गर्नुहोस्",
-    lib_heading: "भोल्टएम्प मिडिया लाइब्रेरी [J]",
+    lib_heading: "सुर्मुनि मिडिया लाइब्रेरी [J]",
     empty_pl_msg: "यहाँ अडियो फाइलहरू तान्नुहोस् वा तल '+ फाइल' क्लिक गर्नुहोस्",
     btn_add_file: "+ फाइल",
     btn_clear_pl: "- खाली",
     btn_shuffle_pl: "⚡ फेरबदल",
     btn_load_pl: "📂 लोड",
     btn_save_pl: "💾 सेभ",
+    now_playing: "हाल बजिरहेको छ",
+    toast_tags_saved: "अडियो ट्यागहरू सफलतापूर्वक सुरक्षित गरियो!",
+    toast_copied: "क्लिपबोर्डमा प्रतिलिपि गरियो!",
+    toast_drop_scan: "फाइलहरू स्क्यान गरिँदैछ (रद्द गर्न Esc थिच्नुहोस्)...",
   },
   hi: {
-    prefs_title: "वोल्टएम्प प्राथमिकताएं [Ctrl+P]",
+    prefs_title: "सुर्मुनि प्राथमिकताएं [Ctrl+P]",
     tab_skins: "स्किन्स और थीम्स",
     tab_audio: "ऑडियो और क्रॉसफ़ेड",
     tab_language: "भाषा (Language)",
     tab_keyboard: "कीबोर्ड शॉर्टकट",
-    tab_about: "वोल्टएम्प के बारे में",
+    tab_about: "सुर्मुनि के बारे में",
     installed_skins: "उपलब्ध थीम्स और स्किन्स",
     load_wsz: "📂 स्थानीय .WSZ स्किन लोड करें...",
     browse_museum: "🌐 स्किन म्यूजियम (65,000+ स्किन्स)",
@@ -117,17 +129,21 @@ export const translations: Record<SupportedLang, Translations> = {
     language_heading: "इंटरफ़ेस भाषा चयन",
     language_select_label: "ऐप की भाषा चुनें:",
     keyboard_heading: "ग्लोबल कीबोर्ड शॉर्टकट्स",
-    about_heading: "वोल्टएम्प संस्करण 1.0",
+    about_heading: "सुर्मुनि संस्करण 1.4.0",
     about_desc1: "रस्ट और टौरी v2 में निर्मित उच्च-प्रदर्शन ऑडियो प्लेयर।",
     about_desc2: "शून्य टेलीमेट्री। अत्यंत हल्का। MP3, FLAC, OGG, MIDI और Chiptunes के लिए 100% ऑफ़लाइन समर्थन।",
     btn_close: "बंद करें",
-    lib_heading: "वोल्टएम्प मीडिया लाइब्रेरी [J]",
+    lib_heading: "सुर्मुनि मीडिया लाइब्रेरी [J]",
     empty_pl_msg: "यहाँ ऑडियो फ़ाइलें खींचें या नीचे '+ फ़ाइल' पर क्लिक करें",
     btn_add_file: "+ फ़ाइल",
     btn_clear_pl: "- खाली करें",
     btn_shuffle_pl: "⚡ फेरबदल",
     btn_load_pl: "📂 लोड",
     btn_save_pl: "💾 सहेजें",
+    now_playing: "अब चल रहा है",
+    toast_tags_saved: "ऑडियो टैग सफलतापूर्वक फ़ाइल में सहेजे गए!",
+    toast_copied: "क्लिपबोर्ड पर कॉपी किया गया!",
+    toast_drop_scan: "फ़ाइलों को बैकग्राउंड में स्कैन किया जा रहा है (रद्द करने के लिए Esc दबाएं)...",
   },
 };
 

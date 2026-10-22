@@ -6,7 +6,9 @@ pub mod commands;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 
 pub use engine::types::{AudioCommand, PlaybackStatus};
 pub use engine::start_audio_engine;
@@ -64,6 +66,8 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .manage(app_state)
         .invoke_handler(tauri::generate_handler![
             play_track,
@@ -102,6 +106,64 @@ pub fn run() {
             let handle: AppHandle = app.handle().clone();
             let timer_status = Arc::clone(&status_for_tick);
 
+            // 1. Build System Tray Menu
+            let tray_play_pause = MenuItem::with_id(app, "tray_play_pause", "Play / Pause", true, None::<&str>)?;
+            let tray_next = MenuItem::with_id(app, "tray_next", "Next Track", true, None::<&str>)?;
+            let tray_prev = MenuItem::with_id(app, "tray_prev", "Previous Track", true, None::<&str>)?;
+            let tray_show_hide = MenuItem::with_id(app, "tray_show_hide", "Show / Hide Surmuni", true, None::<&str>)?;
+            let tray_quit = MenuItem::with_id(app, "tray_quit", "Quit Surmuni", true, None::<&str>)?;
+
+            let tray_menu = Menu::with_items(
+                app,
+                &[
+                    &tray_play_pause,
+                    &tray_next,
+                    &tray_prev,
+                    &tray_show_hide,
+                    &tray_quit,
+                ],
+            )?;
+
+            let _tray = TrayIconBuilder::new()
+                .menu(&tray_menu)
+                .tooltip("Surmuni Audio Player")
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "tray_play_pause" => {
+                        let _ = app.emit("media-key-play-pause", ());
+                    }
+                    "tray_next" => {
+                        let _ = app.emit("media-key-next", ());
+                    }
+                    "tray_prev" => {
+                        let _ = app.emit("media-key-prev", ());
+                    }
+                    "tray_show_hide" => {
+                        if let Some(window) = app.get_webview_window("main") {
+                            if window.is_visible().unwrap_or(true) {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                    }
+                    "tray_quit" => {
+                        app.exit(0);
+                    }
+                    _ => {}
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click { .. } = event {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                })
+                .build(app)?;
+
+            // 2. Playback Tick Heartbeat
             thread::spawn(move || loop {
                 thread::sleep(Duration::from_millis(150));
                 let s = timer_status.lock().unwrap().clone();
