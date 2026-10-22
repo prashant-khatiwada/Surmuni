@@ -16,10 +16,10 @@
       {
         "label": "main",
         "title": "Surmuni Audio Player",
-        "width": 500,
-        "height": 720,
-        "minWidth": 480,
-        "minHeight": 400,
+        "width": 275,
+        "height": 232,
+        "minWidth": 275,
+        "minHeight": 14,
         "decorations": false,
         "transparent": true,
         "resizable": true
