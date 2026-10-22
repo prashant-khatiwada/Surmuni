@@ -534,14 +534,15 @@ clutterV?.addEventListener("click", (e) => {
 // Winamp Classic Cascading Main Menu
 const winampMainMenu = document.getElementById("winamp-main-menu") as HTMLElement;
 
-function openMainMenu(x: number, y: number) {
+function openMainMenu(_x: number, y: number) {
   if (!winampMainMenu) return;
-  // Position the main menu so that flyout submenus cascade inward or outward safely
-  const menuW = 145;
-  const clampedX = Math.max(10, Math.min(x, 275 - menuW - 10));
-  const clampedY = Math.max(10, Math.min(y, window.innerHeight - 200));
+  // Submenu flies left by ~155px. So main menu needs to be at least ~160px from left edge!
+  // Window width is 275px, main menu width is ~110px.
+  // Placing main menu at right side (e.g. left: 160px) ensures submenu (155px) lands at x: 5px inside the window!
+  const menuLeft = 160;
+  const clampedY = Math.max(5, Math.min(y, 116 - 80));
 
-  winampMainMenu.style.left = `${clampedX}px`;
+  winampMainMenu.style.left = `${menuLeft}px`;
   winampMainMenu.style.top = `${clampedY}px`;
   winampMainMenu.style.display = "block";
 }
@@ -719,9 +720,9 @@ function notifyTrackChange(track: TrackMetadata) {
   }
 }
 
-// Global Media Keys & IPC Listeners from System Tray
+// Global Media Keys & IPC Listeners from System Tray & macOS Menu Bar
 async function initGlobalMediaKeys() {
-  // Listen for Tray IPC events
+  // Listen for Tray & Menu Bar IPC events
   listen("media-key-play-pause", () => {
     btnPlay.click();
   });
@@ -730,6 +731,27 @@ async function initGlobalMediaKeys() {
   });
   listen("media-key-prev", () => {
     btnPrev.click();
+  });
+  listen("menu-app-stop", () => {
+    btnStop.click();
+  });
+  listen("menu-app-scale-2x", () => {
+    setAppScale(currentScale === 2 ? 1 : 2);
+  });
+  listen("menu-app-detached", () => {
+    toggleWindowDetachedMode(!MagneticDockEngine.isDetachedMode);
+  });
+  listen("menu-app-eq", () => {
+    btnEqToggle.click();
+  });
+  listen("menu-app-pl", () => {
+    btnPlToggle.click();
+  });
+  listen("menu-app-prefs", () => {
+    togglePreferences();
+  });
+  listen("menu-app-about", () => {
+    alert("Surmuni v1.4.0\nAuthentic, Bit-Perfect Winamp Experience in Rust + Tauri v2.\nLicensed under GNU GPLv3.");
   });
 
   // Listen for Single-Instance CLI file openings

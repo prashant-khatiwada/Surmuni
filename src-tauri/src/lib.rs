@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
-use tauri::menu::{Menu, MenuItem};
+use tauri::menu::{Menu, MenuItem, Submenu};
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 
 pub use engine::types::{AudioCommand, PlaybackStatus};
@@ -118,7 +118,43 @@ pub fn run() {
             let handle: AppHandle = app.handle().clone();
             let timer_status = Arc::clone(&status_for_tick);
 
-            // 1. Build System Tray Menu
+            // 1. Build Native macOS / OS Application Menu Bar
+            let app_menu_about = MenuItem::with_id(app, "menu_about", "About Surmuni", true, None::<&str>)?;
+            let app_menu_prefs = MenuItem::with_id(app, "menu_prefs", "Preferences…", true, Some("CmdOrCtrl+P"))?;
+            let app_menu_quit = MenuItem::with_id(app, "menu_quit", "Quit Surmuni", true, Some("CmdOrCtrl+Q"))?;
+            let app_submenu = Submenu::with_items(app, "Surmuni", true, &[&app_menu_about, &app_menu_prefs, &app_menu_quit])?;
+
+            let playback_play = MenuItem::with_id(app, "menu_play", "Play / Pause", true, Some("Space"))?;
+            let playback_stop = MenuItem::with_id(app, "menu_stop", "Stop", true, Some("V"))?;
+            let playback_next = MenuItem::with_id(app, "menu_next", "Next Track", true, Some("B"))?;
+            let playback_prev = MenuItem::with_id(app, "menu_prev", "Previous Track", true, Some("Z"))?;
+            let playback_submenu = Submenu::with_items(app, "Playback", true, &[&playback_play, &playback_stop, &playback_next, &playback_prev])?;
+
+            let view_double_size = MenuItem::with_id(app, "menu_double_size", "Double Size (2×)", true, Some("CmdOrCtrl+D"))?;
+            let view_detached = MenuItem::with_id(app, "menu_detached", "Detached Windows", true, Some("Alt+D"))?;
+            let view_eq = MenuItem::with_id(app, "menu_eq", "Equalizer", true, Some("Alt+G"))?;
+            let view_pl = MenuItem::with_id(app, "menu_pl", "Playlist", true, Some("Alt+E"))?;
+            let view_submenu = Submenu::with_items(app, "View", true, &[&view_double_size, &view_detached, &view_eq, &view_pl])?;
+
+            let root_menu = Menu::with_items(app, &[&app_submenu, &playback_submenu, &view_submenu])?;
+            let _ = app.set_menu(root_menu);
+
+            app.on_menu_event(|app, event| match event.id.as_ref() {
+                "menu_play" => { let _ = app.emit("media-key-play-pause", ()); }
+                "menu_next" => { let _ = app.emit("media-key-next", ()); }
+                "menu_prev" => { let _ = app.emit("media-key-prev", ()); }
+                "menu_stop" => { let _ = app.emit("menu-app-stop", ()); }
+                "menu_double_size" => { let _ = app.emit("menu-app-scale-2x", ()); }
+                "menu_detached" => { let _ = app.emit("menu-app-detached", ()); }
+                "menu_eq" => { let _ = app.emit("menu-app-eq", ()); }
+                "menu_pl" => { let _ = app.emit("menu-app-pl", ()); }
+                "menu_prefs" => { let _ = app.emit("menu-app-prefs", ()); }
+                "menu_about" => { let _ = app.emit("menu-app-about", ()); }
+                "menu_quit" => { app.exit(0); }
+                _ => {}
+            });
+
+            // 2. Build System Tray Menu
             let tray_play_pause = MenuItem::with_id(app, "tray_play_pause", "Play / Pause", true, None::<&str>)?;
             let tray_next = MenuItem::with_id(app, "tray_next", "Next Track", true, None::<&str>)?;
             let tray_prev = MenuItem::with_id(app, "tray_prev", "Previous Track", true, None::<&str>)?;

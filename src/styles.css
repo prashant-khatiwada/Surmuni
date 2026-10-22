@@ -2186,7 +2186,7 @@ html, body {
 }
 
 .winamp-menu-item.has-submenu::after {
-  content: "▸";
+  content: "◂";
   position: absolute;
   right: 6px;
   color: #b4dcb4;
