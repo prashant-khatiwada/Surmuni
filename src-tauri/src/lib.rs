@@ -75,6 +75,8 @@ pub fn run() {
             set_player_mono,
             update_equalizer,
             set_player_crossfade,
+            set_player_loudness,
+            set_player_replaygain,
             seek_track,
             get_player_status,
             get_metadata,

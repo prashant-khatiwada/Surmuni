@@ -512,14 +512,21 @@ document.getElementById("menu-item-mono")?.addEventListener("click", () => {
   specMono?.classList.toggle("active", isMono);
   closeMainMenu();
 });
+let isLoudnessEnabled = true;
+let isReplayGainEnabled = true;
+
 document.getElementById("menu-item-loudness")?.addEventListener("click", () => {
   const item = document.getElementById("menu-item-loudness");
-  item?.classList.toggle("checked");
+  isLoudnessEnabled = !isLoudnessEnabled;
+  item?.classList.toggle("checked", isLoudnessEnabled);
+  AudioService.setLoudness(isLoudnessEnabled);
   closeMainMenu();
 });
 document.getElementById("menu-item-replaygain")?.addEventListener("click", () => {
   const item = document.getElementById("menu-item-replaygain");
-  item?.classList.toggle("checked");
+  isReplayGainEnabled = !isReplayGainEnabled;
+  item?.classList.toggle("checked", isReplayGainEnabled);
+  AudioService.setReplayGain(isReplayGainEnabled);
   closeMainMenu();
 });
 

@@ -44,6 +44,14 @@ export class AudioService {
     await invoke("set_player_crossfade", { seconds });
   }
 
+  static async setLoudness(enabled: boolean): Promise<void> {
+    await invoke("set_player_loudness", { enabled });
+  }
+
+  static async setReplayGain(enabled: boolean): Promise<void> {
+    await invoke("set_player_replaygain", { enabled });
+  }
+
   static onTick(callback: (status: PlaybackStatus) => void) {
     return listen<PlaybackStatus>("playback-tick", (event) => {
       callback(event.payload);

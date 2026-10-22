@@ -54,6 +54,16 @@ pub fn set_player_crossfade(state: State<'_, AppState>, seconds: f32) {
 }
 
 #[tauri::command]
+pub fn set_player_loudness(state: State<'_, AppState>, enabled: bool) {
+    let _ = state.cmd_tx.send(AudioCommand::SetLoudness(enabled));
+}
+
+#[tauri::command]
+pub fn set_player_replaygain(state: State<'_, AppState>, enabled: bool) {
+    let _ = state.cmd_tx.send(AudioCommand::SetReplayGain(enabled));
+}
+
+#[tauri::command]
 pub fn seek_track(state: State<'_, AppState>, seconds: f64) {
     let _ = state.cmd_tx.send(AudioCommand::Seek(seconds));
 }

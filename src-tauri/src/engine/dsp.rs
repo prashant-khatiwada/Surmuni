@@ -23,12 +23,14 @@ pub struct DspSource<S> {
     pub limiter_head: usize,
     pub limiter_gain: f32,
     // Fletcher-Munson dynamic loudness shelf states
-    pub loudness_enabled: bool,
+    pub loudness_enabled: Arc<Mutex<bool>>,
+    pub replaygain_enabled: Arc<Mutex<bool>>,
     pub master_volume: f32,
     pub low_shelf_state_l: f32,
     pub low_shelf_state_r: f32,
     pub high_shelf_state_l: f32,
     pub high_shelf_state_r: f32,
+    pub fft_sample_buffer: Arc<Mutex<Vec<f32>>>,
 }
 
 impl<S> DspSource<S>
@@ -41,6 +43,9 @@ where
         mono: Arc<Mutex<bool>>,
         eq_config: Arc<Mutex<EqualizerConfig>>,
         replay_gain_db: Option<f32>,
+        loudness_enabled: Arc<Mutex<bool>>,
+        replaygain_enabled: Arc<Mutex<bool>>,
+        fft_sample_buffer: Arc<Mutex<Vec<f32>>>,
     ) -> Self {
         let replay_gain_mult = if let Some(db) = replay_gain_db {
             10.0f32.powf(db / 20.0).clamp(0.1, 4.0)
@@ -62,12 +67,14 @@ where
             limiter_buffer_r: vec![0.0; buf_size],
             limiter_head: 0,
             limiter_gain: 1.0,
-            loudness_enabled: true,
+            loudness_enabled,
+            replaygain_enabled,
             master_volume: 0.8,
             low_shelf_state_l: 0.0,
             low_shelf_state_r: 0.0,
             high_shelf_state_l: 0.0,
             high_shelf_state_r: 0.0,
+            fft_sample_buffer,
         }
     }
 
@@ -85,7 +92,8 @@ where
     /// As volume decreases, low frequencies (120 Hz) and high frequencies (4 kHz) tilt up
     #[inline]
     fn apply_loudness(&mut self, left: &mut f32, right: &mut f32) {
-        if !self.loudness_enabled || self.master_volume >= 0.98 {
+        let is_loudness = *self.loudness_enabled.lock().unwrap();
+        if !is_loudness || self.master_volume >= 0.98 {
             return;
         }
 
@@ -126,8 +134,10 @@ where
             let eq = self.eq_config.lock().unwrap();
 
             // Bit-Perfect Bypass: If EQ is flat, no replay gain, balance center, stereo, volume 100%
+            let use_replaygain = *self.replaygain_enabled.lock().unwrap();
+            let effective_rg = if use_replaygain { self.replay_gain_mult } else { 1.0 };
             let is_eq_flat = !eq.enabled || (eq.preamp.abs() < 0.01 && eq.bands.iter().all(|&b| b.abs() < 0.01));
-            let is_pure = is_eq_flat && (self.replay_gain_mult - 1.0).abs() < 0.01 && bal.abs() < 0.01 && !is_mono && self.master_volume >= 0.98;
+            let is_pure = is_eq_flat && (effective_rg - 1.0).abs() < 0.01 && bal.abs() < 0.01 && !is_mono && self.master_volume >= 0.98;
 
             if is_pure {
                 self.left_sample = left.clamp(-1.0, 1.0);
@@ -136,8 +146,8 @@ where
             }
 
             // 1. ReplayGain auto-leveling
-            left *= self.replay_gain_mult;
-            right *= self.replay_gain_mult;
+            left *= effective_rg;
+            right *= effective_rg;
 
             // 2. 10-Band EQ with Constant-Q and gain-dependent bandwidth:
             if eq.enabled {
@@ -187,6 +197,15 @@ where
 
             self.left_sample = (delayed_l * self.limiter_gain).clamp(-1.0, 1.0);
             self.channel_toggle = true;
+
+            // Tap into FFT ring buffer for live audio visualization
+            if let Ok(mut buf) = self.fft_sample_buffer.try_lock() {
+                buf.push(self.left_sample);
+                let len = buf.len();
+                if len > 1024 {
+                    buf.drain(0..len - 1024);
+                }
+            }
 
             Some(self.left_sample)
         } else {

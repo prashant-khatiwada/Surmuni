@@ -48,6 +48,9 @@ pub fn start_audio_engine(
 
         let dsp_balance = Arc::new(Mutex::new(0.0f32));
         let dsp_mono = Arc::new(Mutex::new(false));
+        let dsp_loudness = Arc::new(Mutex::new(true));
+        let dsp_replaygain = Arc::new(Mutex::new(true));
+        let dsp_fft_buffer = Arc::new(Mutex::new(Vec::<f32>::with_capacity(1024)));
         let dsp_eq = Arc::new(Mutex::new(EqualizerConfig {
             enabled: true,
             preamp: 0.0,
@@ -84,6 +87,9 @@ pub fn start_audio_engine(
                                     Arc::clone(&dsp_mono),
                                     Arc::clone(&dsp_eq),
                                     replay_gain,
+                                    Arc::clone(&dsp_loudness),
+                                    Arc::clone(&dsp_replaygain),
+                                    Arc::clone(&dsp_fft_buffer),
                                 );
 
                                 if let Ok(sink) = Sink::try_new(&stream_handle) {
@@ -114,6 +120,9 @@ pub fn start_audio_engine(
                                             Arc::clone(&dsp_mono),
                                             Arc::clone(&dsp_eq),
                                             replay_gain,
+                                            Arc::clone(&dsp_loudness),
+                                            Arc::clone(&dsp_replaygain),
+                                            Arc::clone(&dsp_fft_buffer),
                                         );
 
                                         if let Ok(sink) = Sink::try_new(&stream_handle) {
@@ -142,6 +151,9 @@ pub fn start_audio_engine(
                                     Arc::clone(&dsp_mono),
                                     Arc::clone(&dsp_eq),
                                     replay_gain,
+                                    Arc::clone(&dsp_loudness),
+                                    Arc::clone(&dsp_replaygain),
+                                    Arc::clone(&dsp_fft_buffer),
                                 );
 
                                 if let Ok(sink) = Sink::try_new(&stream_handle) {
@@ -221,6 +233,9 @@ pub fn start_audio_engine(
                                                 Arc::clone(&dsp_mono),
                                                 Arc::clone(&dsp_eq),
                                                 None,
+                                                Arc::clone(&dsp_loudness),
+                                                Arc::clone(&dsp_replaygain),
+                                                Arc::clone(&dsp_fft_buffer),
                                             );
                                             if let Ok(sink) = Sink::try_new(&stream_handle) {
                                                 sink.set_volume(current_volume);
@@ -250,6 +265,9 @@ pub fn start_audio_engine(
                                         Arc::clone(&dsp_mono),
                                         Arc::clone(&dsp_eq),
                                         None,
+                                        Arc::clone(&dsp_loudness),
+                                        Arc::clone(&dsp_replaygain),
+                                        Arc::clone(&dsp_fft_buffer),
                                     );
                                     if let Ok(sink) = Sink::try_new(&stream_handle) {
                                         sink.set_volume(current_volume);
@@ -288,6 +306,12 @@ pub fn start_audio_engine(
                     AudioCommand::SetCrossfadeSecs(secs) => {
                         crossfade_secs = secs.clamp(0.0, 10.0);
                     }
+                    AudioCommand::SetLoudness(enabled) => {
+                        *dsp_loudness.lock().unwrap() = enabled;
+                    }
+                    AudioCommand::SetReplayGain(enabled) => {
+                        *dsp_replaygain.lock().unwrap() = enabled;
+                    }
                 }
             }
 
@@ -296,16 +320,46 @@ pub fn start_audio_engine(
                 if !sink.empty() {
                     s.position = sink.get_pos().as_secs_f64();
                     if s.is_playing {
-                        // Generate real-time 19-band FFT frequency tap
-                        let pos = s.position;
-                        let mut bands = Vec::with_capacity(19);
-                        for i in 0..19 {
-                            let freq_factor = (i as f64 + 1.0) * 1.6;
-                            let val = ((pos * freq_factor).sin() * 0.5 + 0.5)
-                                * ((pos * 2.3 + i as f64).cos() * 0.4 + 0.6);
-                            bands.push(val.clamp(0.05, 1.0) as f32);
+                        // Compute live 19-band FFT from real decoded audio samples
+                        let mut live_bands = vec![0.0f32; 19];
+                        if let Ok(mut buf) = dsp_fft_buffer.try_lock() {
+                            if buf.len() >= 512 {
+                                let mut fft_input = [0.0f32; 512];
+                                for (i, val) in buf.iter().take(512).enumerate() {
+                                    // Hann windowing
+                                    let window = 0.5 * (1.0 - (2.0 * std::f32::consts::PI * i as f32 / 511.0).cos());
+                                    fft_input[i] = *val * window;
+                                }
+                                buf.clear();
+
+                                let complex_fft = microfft::real::rfft_512(&mut fft_input);
+                                // Map 256 complex frequency bins logarithmically to 19 Winamp bars
+                                for (band_idx, band_val) in live_bands.iter_mut().enumerate() {
+                                    let start_bin = (1.5f32.powf(band_idx as f32 * 0.42) as usize).clamp(1, 250);
+                                    let end_bin = (start_bin + (band_idx / 2).max(1)).clamp(start_bin + 1, 256);
+                                    let mut max_mag = 0.0f32;
+                                    for bin in &complex_fft[start_bin..end_bin] {
+                                        let mag = (bin.re * bin.re + bin.im * bin.im).sqrt();
+                                        if mag > max_mag {
+                                            max_mag = mag;
+                                        }
+                                    }
+                                    // Scale to dB-like 0.0 .. 1.0
+                                    let norm = (max_mag * 0.15).clamp(0.0, 1.0);
+                                    *band_val = norm;
+                                }
+                            }
                         }
-                        s.fft_bands = bands;
+
+                        // Fallback smooth floor if silence or underrun
+                        if live_bands.iter().all(|&v| v < 0.01) {
+                            let pos = s.position;
+                            for (i, val) in live_bands.iter_mut().enumerate() {
+                                let factor = (i as f64 + 1.0) * 1.5;
+                                *val = (((pos * factor).sin() * 0.2 + 0.2) as f32).clamp(0.05, 0.4);
+                            }
+                        }
+                        s.fft_bands = live_bands;
 
                         // AutoDJ Smart Silence Trimming:
                         // Trigger early track transition if near song end (< 2.0s left) to avoid dead air

@@ -42,6 +42,8 @@ pub enum AudioCommand {
     SetMono(bool),
     SetEqualizer(EqualizerConfig),
     SetCrossfadeSecs(f32),
+    SetLoudness(bool),
+    SetReplayGain(bool),
 }
 
 pub struct AppState {
