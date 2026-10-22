@@ -618,6 +618,35 @@ async function initGlobalMediaKeys() {
     btnPrev.click();
   });
 
+  // Listen for Single-Instance CLI file openings
+  listen<string[]>("open-files-from-args", async (event) => {
+    const paths = event.payload;
+    if (paths && paths.length > 0) {
+      for (const p of paths) {
+        try {
+          const meta = await invoke<TrackMetadata>("get_metadata", { path: p });
+          playlist.addTrack(meta);
+        } catch {
+          const fileName = p.split(/[\/\\]/).pop() || "Audio File";
+          playlist.addTrack({
+            title: fileName,
+            artist: "Unknown Artist",
+            album: "Unknown",
+            duration_secs: 0,
+            bitrate: 320,
+            sample_rate: 44100,
+            channels: 2,
+            path: p,
+          });
+        }
+      }
+      renderPlaylistView();
+      if (playlist.currentIndex === -1 && playlist.length > 0) {
+        playIndex(0);
+      }
+    }
+  });
+
   // Register Global OS Media Shortcuts
   try {
     await unregisterAll().catch(() => {});

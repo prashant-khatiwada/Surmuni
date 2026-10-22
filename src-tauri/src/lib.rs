@@ -64,6 +64,17 @@ pub fn run() {
     };
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.set_focus();
+                // Pass opened file arguments to frontend
+                if argv.len() > 1 {
+                    let paths: Vec<String> = argv.into_iter().skip(1).collect();
+                    let _ = app.emit("open-files-from-args", paths);
+                }
+            }
+        }))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
