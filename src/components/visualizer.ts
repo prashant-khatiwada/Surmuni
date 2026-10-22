@@ -10,6 +10,7 @@ export class Visualizer {
   public isPlaying: boolean = false;
   public skin: string = "skin-classic";
   public liveFft: number[] = [];
+  public visColors: string[] = [];
 
   // Stereo Peak / RMS VU State
   private rmsLeft: number = 0;
@@ -61,7 +62,11 @@ export class Visualizer {
         const x = i * 4;
 
         for (let y = 0; y < h; y += 2) {
-          if (this.skin === "skin-kathmandu") {
+          if (this.visColors && this.visColors.length >= 16) {
+            // Authentic 16-color spectrum gradient from viscolor.txt
+            const colorIdx = Math.min(Math.floor((y / 28) * 15) + 2, this.visColors.length - 1);
+            this.ctx.fillStyle = this.visColors[colorIdx] || "#00ff00";
+          } else if (this.skin === "skin-kathmandu") {
             this.ctx.fillStyle = y > 22 ? "#dc2626" : y > 12 ? "#f59e0b" : "#2563eb";
           } else if (this.skin === "skin-neo2026") {
             this.ctx.fillStyle = y > 22 ? "#f43f5e" : y > 14 ? "#c084fc" : "#38bdf8";
@@ -73,7 +78,8 @@ export class Visualizer {
       }
     } else if (this.mode === 1) {
       // 2. Oscilloscope (Zero-crossing synchronized wave)
-      this.ctx.strokeStyle = this.skin === "skin-kathmandu" ? "#2563eb" : this.skin === "skin-neo2026" ? "#38bdf8" : "#00ff00";
+      const oscColor = (this.visColors && this.visColors[18]) ? this.visColors[18] : (this.skin === "skin-kathmandu" ? "#2563eb" : this.skin === "skin-neo2026" ? "#38bdf8" : "#00ff00");
+      this.ctx.strokeStyle = oscColor;
       this.ctx.lineWidth = 1.5;
       this.ctx.beginPath();
 

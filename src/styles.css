@@ -59,6 +59,30 @@ html, body {
   overflow: hidden !important;
 }
 
+.eq-window.windowshade {
+  height: 24px !important;
+  overflow: hidden !important;
+}
+
+.playlist-window.windowshade {
+  height: 24px !important;
+  overflow: hidden !important;
+}
+
+/* WSZ Windowshade modes */
+.winamp-container.skin-wsz .main-window.windowshade,
+.winamp-container.skin-wsz .eq-window.windowshade,
+.winamp-container.skin-wsz .playlist-window.windowshade {
+  height: 14px !important;
+  overflow: hidden !important;
+}
+
+.winamp-container.skin-wsz .main-window.windowshade .main-body,
+.winamp-container.skin-wsz .eq-window.windowshade .eq-body,
+.winamp-container.skin-wsz .playlist-window.windowshade .playlist-body {
+  display: none !important;
+}
+
 .main-window.windowshade .main-body {
   display: none !important;
 }
@@ -2235,7 +2259,33 @@ html, body {
   pointer-events: auto;
 }
 
-.retro-toast.visible {
-  opacity: 1;
-  transform: translateY(0);
+/* Retro Winamp-Styled Micro-Tooltip (Cursor Tracker) */
+.winamp-micro-tooltip {
+  position: fixed;
+  background: #000000;
+  color: #00ff00;
+  border: 1px solid #78c850;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 6px;
+  pointer-events: none;
+  z-index: 1000000;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.85);
+  display: none;
+  white-space: nowrap;
+}
+
+/* Playlist Stepped Resizer Handle */
+.playlist-resize-handle {
+  cursor: se-resize;
+  color: #555566;
+  font-family: monospace;
+  font-size: 9px;
+  padding: 0 4px;
+  user-select: none;
+  margin-left: auto;
+}
+
+.playlist-resize-handle:hover {
+  color: #00ff00;
 }

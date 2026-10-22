@@ -213,7 +213,7 @@ async function fitWindowToDockedStack() {
     totalH += eqWindow.classList.contains("windowshade") ? 14 : 116;
   }
   if (plWindow && plWindow.style.display !== "none") {
-    totalH += plWindow.offsetHeight || 116;
+    totalH += plWindow.classList.contains("windowshade") ? 14 : (plWindow.offsetHeight || 116);
   }
   if (mlWindow && mlWindow.style.display !== "none") {
     totalH += mlWindow.offsetHeight || 200;
@@ -296,9 +296,19 @@ btnMinimize.addEventListener("click", (e) => {
   invoke("app_minimize").catch(() => appWindow.minimize());
 });
 
-// Windowshade mode toggle (button or double-clicking main titlebar)
+// Windowshade mode toggles for Main, EQ, and Playlist
 function toggleWindowshade() {
   mainWindow?.classList.toggle("windowshade");
+  fitWindowToDockedStack();
+}
+
+function toggleEqWindowshade() {
+  eqWindow?.classList.toggle("windowshade");
+  fitWindowToDockedStack();
+}
+
+function togglePlWindowshade() {
+  plWindow?.classList.toggle("windowshade");
   fitWindowToDockedStack();
 }
 
@@ -307,10 +317,34 @@ btnShade?.addEventListener("click", (e) => {
   toggleWindowshade();
 });
 
+document.getElementById("btn-eq-shade")?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  toggleEqWindowshade();
+});
+
+document.getElementById("btn-pl-shade")?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  togglePlWindowshade();
+});
+
 document.querySelector(".main-window .window-titlebar")?.addEventListener("dblclick", (e) => {
   const target = e.target as HTMLElement;
   if (!target.closest("button") && !target.closest("select")) {
     toggleWindowshade();
+  }
+});
+
+document.querySelector(".eq-window .window-titlebar")?.addEventListener("dblclick", (e) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest("button") && !target.closest("select")) {
+    toggleEqWindowshade();
+  }
+});
+
+document.querySelector(".playlist-window .window-titlebar")?.addEventListener("dblclick", (e) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest("button") && !target.closest("select")) {
+    togglePlWindowshade();
   }
 });
 
@@ -360,6 +394,9 @@ async function openSkinMuseum(query = "classic") {
 
       if (manifest) {
         currentSkin = "skin-wsz";
+        if (manifest.vis_colors && manifest.vis_colors.length > 0) {
+          visualizer.visColors = manifest.vis_colors;
+        }
         museumWindow.style.display = "none";
       }
     });
@@ -382,6 +419,78 @@ museumSearchInput?.addEventListener("keydown", (e) => {
 function togglePreferences() {
   const isHidden = prefsWindow.style.display === "none";
   prefsWindow.style.display = isHidden ? "flex" : "none";
+}
+
+// Retro Dynamic Winamp Micro-Tooltip System
+const microTooltip = document.createElement("div");
+microTooltip.className = "winamp-micro-tooltip";
+document.body.appendChild(microTooltip);
+
+function bindMicroTooltip(el: HTMLElement | null, textFn: () => string) {
+  if (!el) return;
+  el.addEventListener("mouseenter", (e) => {
+    microTooltip.textContent = textFn();
+    microTooltip.style.left = `${e.clientX + 10}px`;
+    microTooltip.style.top = `${e.clientY + 12}px`;
+    microTooltip.style.display = "block";
+  });
+  el.addEventListener("mousemove", (e) => {
+    microTooltip.textContent = textFn();
+    microTooltip.style.left = `${Math.min(e.clientX + 10, window.innerWidth - 120)}px`;
+    microTooltip.style.top = `${e.clientY + 12}px`;
+  });
+  el.addEventListener("mouseleave", () => {
+    microTooltip.style.display = "none";
+  });
+}
+
+// Bind sliders & interactive controls
+bindMicroTooltip(volumeSlider, () => `${I18nManager.t("tooltip_vol")}: ${volumeSlider.value}%`);
+bindMicroTooltip(balanceSlider, () => {
+  const b = parseInt(balanceSlider.value);
+  if (b === 0) return `${I18nManager.t("tooltip_bal")}: Center`;
+  return b < 0 ? `${I18nManager.t("tooltip_bal")}: Left ${Math.abs(b)}%` : `${I18nManager.t("tooltip_bal")}: Right ${b}%`;
+});
+bindMicroTooltip(seekSlider, () => `${I18nManager.t("tooltip_seek")}: ${seekSlider.value}%`);
+bindMicroTooltip(btnShade, () => I18nManager.t("tooltip_shade"));
+bindMicroTooltip(document.getElementById("btn-eq-shade"), () => I18nManager.t("tooltip_shade"));
+bindMicroTooltip(document.getElementById("btn-pl-shade"), () => I18nManager.t("tooltip_shade"));
+
+// 29-px Stepped Playlist Resizer (Authentic Winamp 2.x & OneAmp geometry)
+const plResizeHandle = document.getElementById("pl-resize-handle");
+if (plResizeHandle && plWindow) {
+  let isResizingPl = false;
+  let startY = 0;
+  let startHeight = 116;
+
+  plResizeHandle.addEventListener("mousedown", (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    isResizingPl = true;
+    startY = e.clientY;
+    startHeight = plWindow.offsetHeight || 116;
+
+    const onMove = (moveEvent: MouseEvent) => {
+      if (!isResizingPl) return;
+      const dy = moveEvent.clientY - startY;
+      // 29px discrete steps
+      const steps = Math.round(dy / 29);
+      const newHeight = Math.max(116, startHeight + steps * 29);
+      plWindow.style.height = `${newHeight}px`;
+      fitWindowToDockedStack();
+    };
+
+    const onUp = () => {
+      isResizingPl = false;
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      saveSessionState();
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  });
 }
 
 // Clutterbar O A I D V Actions

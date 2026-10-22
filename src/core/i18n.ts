@@ -37,6 +37,10 @@ export interface Translations {
   toast_tags_saved: string;
   toast_copied: string;
   toast_drop_scan: string;
+  tooltip_vol: string;
+  tooltip_bal: string;
+  tooltip_seek: string;
+  tooltip_shade: string;
 }
 
 export const translations: Record<SupportedLang, Translations> = {
@@ -74,6 +78,10 @@ export const translations: Record<SupportedLang, Translations> = {
     toast_tags_saved: "Audio tags successfully saved to file!",
     toast_copied: "Copied to clipboard!",
     toast_drop_scan: "Scanning dropped files in background (Esc to cancel)...",
+    tooltip_vol: "Volume",
+    tooltip_bal: "Balance",
+    tooltip_seek: "Seek",
+    tooltip_shade: "Toggle Windowshade",
   },
   ne: {
     prefs_title: "सुर्मुनि प्राथमिकताहरू [Ctrl+P]",
@@ -109,6 +117,10 @@ export const translations: Record<SupportedLang, Translations> = {
     toast_tags_saved: "अडियो ट्यागहरू सफलतापूर्वक सुरक्षित गरियो!",
     toast_copied: "क्लिपबोर्डमा प्रतिलिपि गरियो!",
     toast_drop_scan: "फाइलहरू स्क्यान गरिँदैछ (रद्द गर्न Esc थिच्नुहोस्)...",
+    tooltip_vol: "भोल्युम",
+    tooltip_bal: "सन्तुलन",
+    tooltip_seek: "खोज्नुहोस्",
+    tooltip_shade: "विन्डोसम्मेट्ने मोड",
   },
   hi: {
     prefs_title: "सुर्मुनि प्राथमिकताएं [Ctrl+P]",
@@ -144,6 +156,10 @@ export const translations: Record<SupportedLang, Translations> = {
     toast_tags_saved: "ऑडियो टैग सफलतापूर्वक फ़ाइल में सहेजे गए!",
     toast_copied: "क्लिपबोर्ड पर कॉपी किया गया!",
     toast_drop_scan: "फ़ाइलों को बैकग्राउंड में स्कैन किया जा रहा है (रद्द करने के लिए Esc दबाएं)...",
+    tooltip_vol: "वॉल्यूम",
+    tooltip_bal: "संतुलन",
+    tooltip_seek: "सीक",
+    tooltip_shade: "विंडोशेड मोड",
   },
 };
 
