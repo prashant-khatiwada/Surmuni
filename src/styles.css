@@ -1,0 +1,2077 @@
+/* WINAMP COMPLETE RETRO & 2026 THEMES ENGINE */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=VT323&display=swap');
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: transparent !important;
+  background: transparent !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 8px;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.winamp-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 480px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 100%;
+}
+
+/* Detached Windows Free-Floating Canvas Mode */
+.winamp-container.detached-canvas {
+  width: 100vw !important;
+  min-width: 100% !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  display: block !important;
+  position: relative !important;
+}
+
+.winamp-container.detached-canvas .winamp-window {
+  position: absolute !important;
+  margin-bottom: 0 !important;
+}
+
+.winamp-window {
+  width: 480px;
+  user-select: none;
+  cursor: default;
+  margin-bottom: 2px;
+}
+
+/* Windowshade Collapsed Mode */
+.main-window.windowshade {
+  height: 24px !important;
+  overflow: hidden !important;
+}
+
+.main-window.windowshade .main-body {
+  display: none !important;
+}
+
+.win-shade {
+  font-size: 8px !important;
+  line-height: 10px !important;
+}
+
+/* ========================================================================== */
+/* 1. CLASSIC 1998 SKIN (Pixel-Authentic Winamp 2.x)                          */
+/* ========================================================================== */
+.winamp-container.skin-classic .winamp-window {
+  background: #2b2b36;
+  border: 2px solid #5a5a6b;
+  border-top-color: #8b8b9b;
+  border-left-color: #8b8b9b;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+}
+
+.winamp-container.skin-classic .window-titlebar {
+  background: linear-gradient(90deg, #0c1630 0%, #1e3b70 50%, #0c1630 100%);
+  color: #00e5ff;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  cursor: grab;
+  border-bottom: 1px solid #141c2b;
+}
+
+.titlebar-handle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.icon-bolt {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  background-image: url("/surmuni_logo.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.8));
+}
+
+.icon-bolt::before {
+  content: "";
+}
+
+.skin-selector-wrapper {
+  margin-left: 6px;
+}
+
+.winamp-container.skin-classic .skin-dropdown {
+  background: #141926;
+  color: #00e5ff;
+  border: 1px solid #334466;
+  font-size: 9px;
+  font-family: monospace;
+  padding: 1px 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.titlebar-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.winamp-container.skin-classic .win-btn {
+  background: #3e3e4a;
+  color: #d1d1d1;
+  border: 1px solid #7a7a8a;
+  border-bottom-color: #1a1a24;
+  border-right-color: #1a1a24;
+  width: 14px;
+  height: 14px;
+  font-size: 10px;
+  line-height: 12px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.winamp-container.skin-classic .main-body {
+  padding: 6px;
+  background: #202028;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Display Area (Visualizer + Digits + Spec) */
+.winamp-container.skin-classic .display-area {
+  background: #000;
+  border: 2px inset #444;
+  height: 48px;
+  display: grid;
+  grid-template-columns: 78px 1fr 64px;
+  align-items: center;
+  padding: 3px 6px;
+  gap: 6px;
+}
+
+.visualizer-box {
+  width: 76px;
+  height: 36px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#vis-canvas {
+  width: 76px;
+  height: 34px;
+  image-rendering: pixelated;
+}
+
+.timer-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.winamp-container.skin-classic .time-mode {
+  font-size: 8px;
+  color: #00aa00;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.winamp-container.skin-classic .digits {
+  font-size: 26px;
+  font-weight: 700;
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+  text-shadow: 0 0 6px rgba(0, 255, 0, 0.7);
+  letter-spacing: 1px;
+}
+
+.audio-specs-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  font-family: monospace;
+  font-size: 8px;
+  color: #00aa00;
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.spec-val {
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.spec-channels {
+  display: flex;
+  gap: 4px;
+  margin-top: 1px;
+}
+
+.spec-stereo.active, .spec-mono.active {
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.spec-stereo:not(.active), .spec-mono:not(.active) {
+  color: #003300;
+}
+
+/* Marquee Song Title */
+.winamp-container.skin-classic .marquee-container {
+  background: #000;
+  border: 1px inset #333;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 22px;
+  display: flex;
+  align-items: center;
+}
+
+.marquee-text {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-left 14s linear infinite;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Controls Sliders Row */
+.controls-sliders-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.slider-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #999;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+.winamp-container.skin-classic .winamp-slider {
+  -webkit-appearance: none;
+  background: #111;
+  border: 1px solid #444;
+  height: 8px;
+  width: 100%;
+  outline: none;
+}
+
+.winamp-container.skin-classic .winamp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #8e9099;
+  border: 1px solid #ccc;
+  border-bottom-color: #222;
+  border-right-color: #222;
+  width: 14px;
+  height: 12px;
+  cursor: pointer;
+}
+
+.toggle-indicators {
+  display: flex;
+  gap: 2px;
+}
+
+.winamp-container.skin-classic .toggle-btn {
+  background: #2a2a35;
+  color: #666;
+  border: 1px solid #444;
+  font-size: 8px;
+  padding: 2px 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.winamp-container.skin-classic .toggle-btn.active {
+  background: #103020;
+  color: #00ff00;
+  border-color: #00ff00;
+  box-shadow: 0 0 4px #00ff00;
+}
+
+/* Seek Bar */
+.seek-bar-container {
+  width: 100%;
+}
+
+.winamp-container.skin-classic .winamp-seek {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  background: #0a0a0e;
+  border: 1px inset #444;
+  outline: none;
+}
+
+.winamp-container.skin-classic .winamp-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: linear-gradient(180deg, #c0c0c8 0%, #70707a 100%);
+  border: 1px solid #fff;
+  border-bottom-color: #333;
+  border-right-color: #333;
+  width: 26px;
+  height: 10px;
+  cursor: pointer;
+}
+
+/* Transport Bar */
+.transport-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) 1.2fr;
+  gap: 3px;
+  align-items: center;
+}
+
+.winamp-container.skin-classic .transport-btn {
+  background: linear-gradient(180deg, #4c4d59 0%, #2f303a 100%);
+  color: #fff;
+  border: 1px solid #6c6d7a;
+  border-bottom-color: #15161a;
+  border-right-color: #15161a;
+  padding: 5px 0;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+
+.winamp-container.skin-classic .transport-btn.play-pause-btn.is-playing {
+  color: #00ff66;
+  border-color: #00aa44;
+  background: linear-gradient(180deg, #3a4a3e 0%, #1a291f 100%);
+}
+
+.winamp-container.skin-classic .transport-btn:active {
+  border: 1px solid #15161a;
+  background: #202128;
+}
+
+.winamp-container.skin-classic .eject-btn {
+  color: #ffaa00;
+}
+
+/* EQUALIZER WINDOW */
+.eq-window {
+  margin-top: 1px;
+}
+
+.winamp-container.skin-classic .eq-body {
+  background: #1f1f28;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.eq-top-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+.winamp-container.skin-classic .eq-button {
+  background: #2a2a35;
+  color: #888;
+  border: 1px solid #444;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.winamp-container.skin-classic .eq-button.active {
+  background: #004400;
+  color: #00ff00;
+  border-color: #00aa00;
+}
+
+.eq-preset-wrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.winamp-container.skin-classic .eq-preset-select {
+  background: #14141c;
+  color: #00ff00;
+  border: 1px solid #444;
+  font-size: 9px;
+  font-family: monospace;
+  padding: 1px 4px;
+  outline: none;
+}
+
+/* EQ Sliders Container with Authentic Winamp 2.x Metallic/Grooved Layout */
+.winamp-container.skin-classic .eq-sliders-container {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  background: #0d0d14;
+  padding: 10px 14px;
+  border: 2px inset #3a3a48;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.eq-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 8.5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: #00ff00;
+  text-shadow: 0 0 2px rgba(0, 255, 0, 0.6);
+}
+
+.preamp-col {
+  border-right: 1px solid #2a2a38;
+  padding-right: 10px;
+}
+
+.eq-band-label {
+  font-size: 7.5px;
+  color: #ffaa00;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 2px rgba(255, 170, 0, 0.5);
+}
+
+.eq-bands {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.slider-track-wrap {
+  height: 84px;
+  width: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #181822 0%, #050508 50%, #222230 100%);
+  border: 1px solid #333342;
+  border-radius: 2px;
+  position: relative;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+/* Authentic Winamp Grooved Notch Center Mark at 0dB */
+.slider-track-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  right: 1px;
+  height: 1px;
+  background: #444455;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+.eq-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 84px;
+  cursor: pointer;
+  background: transparent;
+  outline: none;
+}
+
+.eq-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 11px;
+  background: linear-gradient(180deg, #c5c8d0 0%, #8e929d 40%, #5d616c 100%);
+  border: 1px solid #eef;
+  border-bottom-color: #222;
+  border-right-color: #222;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+}
+
+.eq-slider::-webkit-slider-thumb:hover {
+  background: linear-gradient(180deg, #e0e2e8 0%, #a2a6b2 40%, #6e727e 100%);
+}
+
+.eq-slider::-webkit-slider-thumb:active {
+  background: linear-gradient(180deg, #6e727e 0%, #8e929d 60%, #c5c8d0 100%);
+  border-top-color: #222;
+  border-left-color: #222;
+  border-bottom-color: #eee;
+  border-right-color: #eee;
+}
+
+/* PLAYLIST WINDOW */
+.playlist-window {
+  margin-top: 1px;
+}
+
+.playlist-body {
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+.winamp-container.skin-classic .playlist-items-box {
+  height: 130px;
+  overflow-y: auto;
+  padding: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #00e000;
+  background: #08080c;
+  border: 1px inset #222;
+}
+
+.playlist-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.winamp-container.skin-classic .playlist-item:hover {
+  background: #142820;
+}
+
+.winamp-container.skin-classic .playlist-item.selected {
+  background: #000088;
+  color: #fff;
+}
+
+/* Dimmed Missing File Styling */
+.playlist-item.missing-track {
+  opacity: 0.42;
+  font-style: italic;
+  filter: grayscale(100%);
+}
+
+.playlist-item.missing-track:hover {
+  opacity: 0.65;
+}
+
+.missing-badge {
+  font-size: 8px;
+  color: #ff4444;
+  font-weight: bold;
+}
+
+.winamp-container.skin-classic .playlist-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 6px;
+  background: #202028;
+  border-top: 1px solid #333;
+}
+
+.pl-actions-left {
+  display: flex;
+  gap: 4px;
+}
+
+/* MEDIA LIBRARY WINDOW (ml_local) */
+.library-window {
+  background: #2b2b36;
+  border: 2px solid #5a5a6b;
+  border-top-color: #8b8b9b;
+  border-left-color: #8b8b9b;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+}
+
+.library-body {
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+.library-toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: #202028;
+  border-bottom: 1px solid #333;
+}
+
+.ml-search {
+  flex: 1;
+  background: #08080c;
+  color: #00ff00;
+  border: 1px inset #444;
+  padding: 3px 6px;
+  font-family: monospace;
+  font-size: 11px;
+  outline: none;
+}
+
+.ml-btn {
+  background: #3a3a46;
+  color: #eee;
+  border: 1px solid #777;
+  border-bottom-color: #111;
+  border-right-color: #111;
+  font-size: 9px;
+  font-family: monospace;
+  font-weight: bold;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+
+.ml-btn:active {
+  border-top-color: #111;
+  border-left-color: #111;
+  border-bottom-color: #777;
+  border-right-color: #777;
+}
+
+.library-tracks-box {
+  height: 280px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #00e000;
+  background: #08080c;
+  border: 1px inset #222;
+}
+
+.library-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 6px;
+  background: #202028;
+  border-top: 1px solid #333;
+  font-family: monospace;
+  font-size: 9px;
+  color: #aaa;
+}
+
+/* JUMP TO FILE WINDOW */
+.jump-window {
+  background: #2b2b36;
+  border: 2px solid #5a5a6b;
+  border-top-color: #8b8b9b;
+  border-left-color: #8b8b9b;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  width: 440px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+.jump-body {
+  background: #14141c;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 8px;
+}
+
+.jump-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #00ff66;
+}
+
+.jump-results-box {
+  height: 180px;
+  overflow-y: auto;
+  background: #08080c;
+  border: 1px inset #222;
+  padding: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #00e000;
+}
+
+.jump-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 6px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.jump-item:hover, .jump-item.active {
+  background: #000088;
+  color: #fff;
+}
+
+.jump-footer-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: monospace;
+  font-size: 10px;
+  color: #888;
+}
+
+.jump-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Play Next Queue Badge */
+.queue-badge {
+  background: #2563eb;
+  color: #fff;
+  font-size: 8px;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 6px;
+}
+
+/* Resizable Playlist Frame */
+.playlist-window {
+  resize: vertical;
+  overflow: hidden;
+  min-height: 160px;
+  max-height: 700px;
+}
+
+.playlist-window .playlist-items-box {
+  flex: 1;
+  min-height: 100px;
+}
+
+/* Background Drop Overlay */
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 100, 255, 0.25);
+  border: 2px dashed #00aaff;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 14px;
+  pointer-events: none;
+  display: none;
+}
+
+.drop-overlay.active {
+  display: flex;
+}
+
+/* MILKDROP 2 WEBGL VISUALIZER WINDOW */
+.milkdrop-window {
+  background: #1a1a24;
+  border: 2px solid #5a5a6b;
+  border-top-color: #8b8b9b;
+  border-left-color: #8b8b9b;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+}
+
+/* SKIN MUSEUM WINDOW */
+.museum-window {
+  background: #2b2b36;
+  border: 2px solid #5a5a6b;
+  border-top-color: #8b8b9b;
+  border-left-color: #8b8b9b;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+}
+
+.museum-body {
+  background: #121218;
+  display: flex;
+  flex-direction: column;
+}
+
+.museum-grid-container {
+  height: 240px;
+  overflow-y: auto;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  background: #08080c;
+}
+
+.museum-card {
+  background: #1c1c24;
+  border: 1px solid #333;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.museum-card:hover {
+  border-color: #00ff00;
+}
+
+.museum-thumb {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  background: #000;
+  border: 1px inset #222;
+}
+
+.museum-title {
+  font-family: monospace;
+  font-size: 10px;
+  color: #00e5ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playlist-cover-art {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #555;
+  object-fit: cover;
+  margin-right: 6px;
+  border-radius: 2px;
+}
+
+/* PREFERENCES WINDOW (Winamp Ctrl+P) */
+.prefs-window {
+  background: #2b2b36;
+  border: 2px solid #5a5a6b;
+  border-top-color: #8b8b9b;
+  border-left-color: #8b8b9b;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+}
+
+.prefs-body {
+  display: flex;
+  height: 200px;
+  background: #1e1e26;
+  border-bottom: 1px solid #333;
+}
+
+.prefs-sidebar {
+  width: 140px;
+  background: #14141c;
+  border-right: 1px solid #333;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prefs-tab {
+  padding: 4px 6px;
+  font-size: 10px;
+  font-family: monospace;
+  color: #aaa;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.prefs-tab:hover {
+  background: #222230;
+  color: #fff;
+}
+
+.prefs-tab.active {
+  background: #000088;
+  color: #fff;
+  font-weight: bold;
+}
+
+.prefs-content {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.prefs-heading {
+  font-family: monospace;
+  font-size: 11px;
+  color: #00e5ff;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 3px;
+}
+
+.skin-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: monospace;
+  font-size: 10px;
+  color: #eee;
+}
+
+.skin-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.prefs-button-row {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+}
+
+.prefs-setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-family: monospace;
+  font-size: 10px;
+  color: #ddd;
+}
+
+.active-badge {
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.about-desc {
+  font-family: monospace;
+  font-size: 10px;
+  color: #aaa;
+  line-height: 14px;
+  margin-bottom: 6px;
+}
+
+.prefs-footer {
+  padding: 6px;
+  background: #202028;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.shortcuts-table {
+  width: 100%;
+  font-family: monospace;
+  font-size: 10px;
+  color: #ccc;
+  border-collapse: collapse;
+}
+
+.shortcuts-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #2a2a38;
+}
+
+.shortcuts-table td:first-child {
+  color: #00e5ff;
+  width: 140px;
+}
+
+.win-prefs {
+  font-size: 9px !important;
+  line-height: 11px !important;
+}
+
+.milkdrop-body {
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.milkdrop-canvas {
+  width: 100%;
+  height: 260px;
+  background: #000;
+  display: block;
+}
+
+.milkdrop-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 8px;
+  background: #202028;
+  border-top: 1px solid #333;
+  font-family: monospace;
+  font-size: 9px;
+  color: #00e5ff;
+}
+
+.winamp-container.skin-classic .pl-btn {
+  background: #3e3e4a;
+  color: #ddd;
+  border: 1px solid #666;
+  padding: 2px 6px;
+  font-size: 9px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.pl-info-right {
+  color: #00e5ff;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.empty-playlist-msg {
+  color: #555;
+  text-align: center;
+  padding: 35px 0;
+  font-style: italic;
+  font-size: 11px;
+}
+
+
+/* ========================================================================== */
+/* ========================================================================== */
+/* 2. KATHMANDU (Modern Flat UI with Subtle Textured Surface & Accents)        */
+/* ========================================================================== */
+.winamp-container.skin-kathmandu {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #0f172a;
+}
+
+.winamp-container.skin-kathmandu .winamp-window {
+  /* Modern clean card with subtle tactile micro-texture pattern */
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 0),
+    linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  background-size: 8px 8px, 100% 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  box-shadow: 
+    0 1px 3px rgba(15, 23, 42, 0.06),
+    0 8px 24px -4px rgba(15, 23, 42, 0.12);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.winamp-container.skin-kathmandu .window-titlebar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.winamp-container.skin-kathmandu .titlebar-handle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.winamp-container.skin-kathmandu .titlebar-handle .icon-bolt {
+  color: #dc2626; /* Crimson Red */
+  font-size: 13px;
+}
+
+/* Authentic Flat Traffic Light OS Buttons */
+.winamp-container.skin-kathmandu .titlebar-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.winamp-container.skin-kathmandu .win-btn {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  font-size: 0px !important;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.winamp-container.skin-kathmandu .win-btn:hover {
+  filter: brightness(0.9);
+  transform: scale(1.12);
+}
+
+.winamp-container.skin-kathmandu .win-close {
+  background: #ef4444 !important; /* Flat Crimson Red */
+  border-color: #dc2626 !important;
+}
+.winamp-container.skin-kathmandu .win-minimize {
+  background: #f59e0b !important; /* Flat Amber */
+  border-color: #d97706 !important;
+}
+.winamp-container.skin-kathmandu .win-shade {
+  background: #10b981 !important; /* Flat Emerald */
+  border-color: #059669 !important;
+}
+.winamp-container.skin-kathmandu .win-prefs {
+  background: #2563eb !important; /* Flat Royal Azure */
+  border-color: #1d4ed8 !important;
+}
+
+.winamp-container.skin-kathmandu .main-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Tactile LCD Display Area */
+.winamp-container.skin-kathmandu .display-area {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  height: 62px;
+  display: grid;
+  grid-template-columns: 84px 1fr 72px;
+  align-items: center;
+  padding: 6px 12px;
+  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.03);
+}
+
+.winamp-container.skin-kathmandu .visualizer-box {
+  background: #0f172a;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.winamp-container.skin-kathmandu .timer-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.winamp-container.skin-kathmandu .fallback-digits {
+  color: #1d4ed8 !important; /* Crisp Deep Azure */
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.winamp-container.skin-kathmandu .time-mode {
+  color: #dc2626; /* Crimson Red Accent */
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.winamp-container.skin-kathmandu .audio-specs-box {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.winamp-container.skin-kathmandu .spec-val {
+  color: #2563eb;
+  font-weight: 800;
+}
+
+.winamp-container.skin-kathmandu .spec-stereo.active {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+/* Song Title Marquee */
+.winamp-container.skin-kathmandu .marquee-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 600;
+  height: 32px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.winamp-container.skin-kathmandu .controls-sliders-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.winamp-container.skin-kathmandu .slider-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #64748b;
+  margin-right: 6px;
+}
+
+.winamp-container.skin-kathmandu .winamp-slider {
+  -webkit-appearance: none;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  height: 6px;
+  width: 100%;
+}
+
+.winamp-container.skin-kathmandu .winamp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #2563eb;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.35);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.winamp-container.skin-kathmandu .winamp-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.winamp-container.skin-kathmandu .toggle-indicators {
+  display: flex;
+  gap: 5px;
+}
+
+.winamp-container.skin-kathmandu .toggle-btn {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 9px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: all 0.15s ease;
+}
+
+.winamp-container.skin-kathmandu .toggle-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.winamp-container.skin-kathmandu .toggle-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+}
+
+.winamp-container.skin-kathmandu .winamp-seek {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 7px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+}
+
+.winamp-container.skin-kathmandu .winamp-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #dc2626; /* Crimson seek thumb */
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.45);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.winamp-container.skin-kathmandu .winamp-seek::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Modern Flat Segmented Transport Bar */
+.winamp-container.skin-kathmandu .transport-bar {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.winamp-container.skin-kathmandu .transport-btn {
+  flex: 1;
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 0;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: all 0.12s ease;
+}
+
+.winamp-container.skin-kathmandu .transport-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.winamp-container.skin-kathmandu .transport-btn:active {
+  background: #f1f5f9;
+  transform: translateY(1px);
+}
+
+.winamp-container.skin-kathmandu #btn-play {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+}
+
+.winamp-container.skin-kathmandu #btn-play:hover {
+  background: #1d4ed8;
+}
+
+.winamp-container.skin-kathmandu .eject-btn {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.winamp-container.skin-kathmandu .eject-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* Equalizer, Playlist, Library Bodies */
+.winamp-container.skin-kathmandu .eq-body,
+.winamp-container.skin-kathmandu .playlist-body,
+.winamp-container.skin-kathmandu .library-body,
+.winamp-container.skin-kathmandu .prefs-body,
+.winamp-container.skin-kathmandu .prefs-footer,
+.winamp-container.skin-kathmandu .museum-body,
+.winamp-container.skin-kathmandu .milkdrop-body {
+  padding: 14px;
+}
+
+.winamp-container.skin-kathmandu .eq-sliders-container,
+.winamp-container.skin-kathmandu .playlist-items-box,
+.winamp-container.skin-kathmandu .museum-grid-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #0f172a;
+  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.winamp-container.skin-kathmandu .library-tracks-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #0f172a;
+  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.03);
+  height: 280px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.winamp-container.skin-kathmandu .eq-button,
+.winamp-container.skin-kathmandu .pl-btn,
+.winamp-container.skin-kathmandu .ml-btn {
+  background: #ffffff;
+  color: #2563eb;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 6px 12px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: all 0.15s ease;
+}
+
+.winamp-container.skin-kathmandu .eq-button:hover,
+.winamp-container.skin-kathmandu .pl-btn:hover,
+.winamp-container.skin-kathmandu .ml-btn:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.winamp-container.skin-kathmandu .eq-button.active {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #b91c1c;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
+}
+
+.winamp-container.skin-kathmandu .eq-preset-select {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  color: #0f172a;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+}
+
+.winamp-container.skin-kathmandu .eq-sliders-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.winamp-container.skin-kathmandu .eq-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.winamp-container.skin-kathmandu .slider-track-wrap {
+  height: 80px;
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.winamp-container.skin-kathmandu .eq-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: slider-vertical;
+  width: 12px;
+  height: 76px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.winamp-container.skin-kathmandu .playlist-items-box {
+  background: #0f172a !important; /* Authentic Dark Contrast for Playlist */
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  height: 140px;
+  overflow-y: auto;
+  padding: 6px;
+  color: #38bdf8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+}
+
+.winamp-container.skin-kathmandu .playlist-item {
+  color: #94a3b8;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 11px;
+  transition: all 0.1s ease;
+}
+
+.winamp-container.skin-kathmandu .playlist-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.winamp-container.skin-kathmandu .playlist-item.selected {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+}
+
+.winamp-container.skin-kathmandu .pl-info-right {
+  color: #2563eb;
+  font-weight: 800;
+  font-size: 11.5px;
+}
+
+.winamp-container.skin-kathmandu .prefs-sidebar {
+  border-right: 1px solid #e2e8f0;
+}
+
+.winamp-container.skin-kathmandu .prefs-tab {
+  color: #475569;
+  padding: 9px 14px;
+  border-radius: 7px;
+  font-weight: 600;
+  font-size: 11.5px;
+  transition: all 0.12s ease;
+}
+
+.winamp-container.skin-kathmandu .prefs-tab:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.winamp-container.skin-kathmandu .prefs-tab.active {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 700;
+  border-left: 3px solid #2563eb;
+}
+
+.winamp-container.skin-kathmandu .prefs-heading {
+  color: #0f172a;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+
+.winamp-container.skin-kathmandu .playlist-item {
+  color: #374151;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: background 0.1s ease;
+}
+
+.winamp-container.skin-kathmandu .playlist-item:hover {
+  background: #f3f4f6;
+}
+
+.winamp-container.skin-kathmandu .playlist-item.selected {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.winamp-container.skin-kathmandu .pl-info-right {
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.winamp-container.skin-kathmandu .prefs-sidebar {
+  border-right: 1px solid #e5e7eb;
+}
+
+.winamp-container.skin-kathmandu .prefs-tab {
+  color: #4b5563;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.winamp-container.skin-kathmandu .prefs-tab:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.winamp-container.skin-kathmandu .prefs-tab.active {
+  background: #eff6ff;
+  color: #2563eb;
+  border-left: 3px solid #2563eb;
+}
+
+.winamp-container.skin-kathmandu .prefs-heading {
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+
+
+/* ========================================================================== */
+/* 3. NEO-WINAMP 2026 ✨ (The Modern Redefined Winamp Experience)             */
+/* ========================================================================== */
+.winamp-container.skin-neo2026 {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  gap: 12px;
+  width: 500px;
+}
+
+.winamp-container.skin-neo2026 .winamp-window {
+  background: rgba(22, 27, 46, 0.88);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.winamp-container.skin-neo2026 .winamp-window:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45), 0 0 24px rgba(99, 102, 241, 0.18);
+}
+
+.winamp-container.skin-neo2026 .window-titlebar {
+  background: rgba(255, 255, 255, 0.03);
+  color: #f8fafc;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.winamp-container.skin-neo2026 .title-text {
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  background: linear-gradient(135deg, #a5b4fc 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.winamp-container.skin-neo2026 .skin-dropdown {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.winamp-container.skin-neo2026 .skin-dropdown:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #38bdf8;
+}
+
+.winamp-container.skin-neo2026 .win-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.winamp-container.skin-neo2026 .win-close:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.winamp-container.skin-neo2026 .win-minimize:hover {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #fff;
+}
+
+.winamp-container.skin-neo2026 .main-body {
+  padding: 14px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 2026 High-Tech Segment Display Card */
+.winamp-container.skin-neo2026 .display-area {
+  background: rgba(8, 11, 22, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  height: 64px;
+  display: grid;
+  grid-template-columns: 86px 1fr 70px;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 10px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.winamp-container.skin-neo2026 .digits {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(180deg, #67e8f9 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  line-height: 1;
+}
+
+.winamp-container.skin-neo2026 .time-mode {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 1.5px;
+  margin-bottom: 2px;
+}
+
+.winamp-container.skin-neo2026 .audio-specs-box {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: #64748b;
+}
+
+.winamp-container.skin-neo2026 .spec-val {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.winamp-container.skin-neo2026 .spec-stereo.active {
+  color: #34d399;
+  font-weight: 700;
+}
+
+/* Glowing Neon Marquee */
+.winamp-container.skin-neo2026 .marquee-container {
+  background: rgba(10, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  height: 28px;
+  padding: 0 10px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 2026 Slider Controls */
+.winamp-container.skin-neo2026 .controls-sliders-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+}
+
+.winamp-container.skin-neo2026 .slider-label {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.winamp-container.skin-neo2026 .winamp-slider {
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.08);
+  height: 6px;
+  border-radius: 10px;
+  border: none;
+}
+
+.winamp-container.skin-neo2026 .winamp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #38bdf8;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.6);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.winamp-container.skin-neo2026 .winamp-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.winamp-container.skin-neo2026 .toggle-indicators {
+  gap: 6px;
+}
+
+.winamp-container.skin-neo2026 .toggle-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.winamp-container.skin-neo2026 .toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.winamp-container.skin-neo2026 .toggle-btn.active {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.45);
+}
+
+/* 2026 Seek Track */
+.winamp-container.skin-neo2026 .winamp-seek {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  border: none;
+}
+
+.winamp-container.skin-neo2026 .winamp-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 4px 10px rgba(129, 140, 248, 0.6);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.winamp-container.skin-neo2026 .winamp-seek::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* 2026 Sculpted Modern Transport Buttons */
+.winamp-container.skin-neo2026 .transport-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr) 1.3fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.winamp-container.skin-neo2026 .transport-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 0;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.winamp-container.skin-neo2026 .transport-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.winamp-container.skin-neo2026 .transport-btn:active {
+  transform: translateY(0);
+}
+
+.winamp-container.skin-neo2026 #btn-play {
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  border: none;
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.45);
+}
+
+.winamp-container.skin-neo2026 #btn-play:hover {
+  box-shadow: 0 6px 22px rgba(6, 182, 212, 0.65);
+}
+
+.winamp-container.skin-neo2026 .eject-btn {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(234, 88, 12, 0.25) 100%);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+/* 2026 EQ Styling with Fixed Spacing & Centered Sliders */
+.winamp-container.skin-neo2026 .eq-body,
+.winamp-container.skin-neo2026 .playlist-body {
+  background: transparent;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.winamp-container.skin-neo2026 .eq-button {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.winamp-container.skin-neo2026 .eq-button.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+}
+
+.winamp-container.skin-neo2026 .eq-preset-select {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+}
+
+.winamp-container.skin-neo2026 .eq-sliders-container {
+  background: rgba(8, 11, 22, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 14px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.winamp-container.skin-neo2026 .eq-col {
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.winamp-container.skin-neo2026 .slider-track-wrap {
+  height: 80px;
+  width: 18px;
+}
+
+.winamp-container.skin-neo2026 .eq-slider {
+  width: 14px;
+  height: 76px;
+  accent-color: #38bdf8;
+}
+
+/* 2026 Playlist styling */
+.winamp-container.skin-neo2026 .playlist-items-box {
+  background: rgba(8, 11, 22, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  height: 140px;
+  padding: 6px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.winamp-container.skin-neo2026 .playlist-item {
+  border-radius: 8px;
+  padding: 6px 10px;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.winamp-container.skin-neo2026 .playlist-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.winamp-container.skin-neo2026 .playlist-item.selected {
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.8) 0%, rgba(168, 85, 247, 0.8) 100%);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+
+.winamp-container.skin-neo2026 .playlist-bottom-bar {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 8px 0 0 0;
+}
+
+.winamp-container.skin-neo2026 .pl-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.winamp-container.skin-neo2026 .pl-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.winamp-container.skin-neo2026 .pl-info-right {
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 800;
+}

@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Surmuni</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app" class="winamp-container skin-classic">
+      <!-- 1. MAIN PLAYER WINDOW -->
+      <div class="winamp-window main-window">
+        <!-- Titlebar -->
+        <div class="window-titlebar">
+          <div class="titlebar-handle">
+            <span class="icon-bolt" id="btn-pref-icon" title="Preferences [Ctrl+P]"></span>
+            <span class="title-text">SURMUNI</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-prefs" id="btn-prefs" title="Preferences [Ctrl+P]">⚙</button>
+            <button class="win-btn win-shade" id="btn-shade" title="Toggle Windowshade Mode">▾</button>
+            <button class="win-btn win-minimize" id="btn-minimize" title="Minimize">_</button>
+            <button class="win-btn win-close" id="btn-close" title="Close">×</button>
+          </div>
+        </div>
+
+        <!-- Main Body -->
+        <div class="main-body">
+          <!-- Top Row: LCD Display + Visualizer -->
+          <div class="display-area">
+            <!-- Left: Visualizer Canvas -->
+            <div class="visualizer-box">
+              <canvas id="vis-canvas" width="76" height="34"></canvas>
+            </div>
+
+            <!-- Middle: Time Display -->
+            <div class="timer-box">
+              <span class="time-mode" id="time-mode">TIME</span>
+              <div class="timer-digits-wrap" id="timer-digits-wrap">
+                <canvas id="timer-canvas" width="58" height="13" class="pixel-timer-canvas"></canvas>
+                <span class="digits fallback-digits" id="time-display" style="display: none;">00:00</span>
+              </div>
+            </div>
+
+            <!-- Right: KBPS / KHZ / Channels -->
+            <div class="audio-specs-box">
+              <div class="spec-row">
+                <span class="spec-label">KBPS</span>
+                <span class="spec-val" id="spec-kbps">320</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">KHZ</span>
+                <span class="spec-val" id="spec-khz">44</span>
+              </div>
+              <div class="spec-row spec-channels">
+                <span class="spec-stereo active" id="spec-stereo">STEREO</span>
+                <span class="spec-mono" id="spec-mono">MONO</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Marquee Song Title -->
+          <div class="marquee-container">
+            <div class="marquee-text" id="track-title-display">
+              1. SURMUNI — HIGH POWER RETRO AUDIO ENGINE (NO TRACK LOADED)
+            </div>
+          </div>
+
+          <!-- Sliders Row: Volume, Balance, Toggles -->
+          <div class="controls-sliders-row">
+            <div class="slider-group vol-group">
+              <span class="slider-label">VOL</span>
+              <input type="range" id="volume-slider" min="0" max="100" value="80" class="winamp-slider" />
+            </div>
+
+            <div class="slider-group bal-group">
+              <span class="slider-label">BAL</span>
+              <input type="range" id="balance-slider" min="-100" max="100" value="0" class="winamp-slider" />
+            </div>
+
+            <div class="toggle-indicators">
+              <button class="toggle-btn active" id="btn-eq-toggle">EQ</button>
+              <button class="toggle-btn active" id="btn-pl-toggle">PL</button>
+              <button class="toggle-btn" id="btn-ml-toggle" title="Media Library [J]">LIB</button>
+              <button class="toggle-btn" id="btn-vis-toggle" title="MilkDrop WebGL Visualizer [Ctrl+Shift+K]">VIS</button>
+              <button class="toggle-btn" id="btn-shuffle">SHUF</button>
+              <button class="toggle-btn" id="btn-repeat">REP</button>
+            </div>
+          </div>
+
+          <!-- Position Seek Bar -->
+          <div class="seek-bar-container">
+            <input type="range" id="seek-slider" min="0" max="100" value="0" step="0.1" class="winamp-seek" />
+          </div>
+
+          <!-- Transport Buttons Row -->
+          <div class="transport-bar">
+            <button class="transport-btn" id="btn-prev" title="Previous Track [Z]">|◄◄</button>
+            <button class="transport-btn play-pause-btn" id="btn-play" title="Play / Pause [X/C]">►</button>
+            <button class="transport-btn" id="btn-stop" title="Stop [V]">■</button>
+            <button class="transport-btn" id="btn-next" title="Next Track [B]">►►|</button>
+            <button class="transport-btn eject-btn" id="btn-eject" title="Open Media File(s)">▲</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. EQUALIZER WINDOW -->
+      <div class="winamp-window eq-window" id="eq-window">
+        <!-- Titlebar -->
+        <div class="window-titlebar eq-titlebar">
+          <div class="titlebar-handle">
+            <span class="title-text">EQUALIZER</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-close" id="btn-eq-close" title="Close Equalizer">×</button>
+          </div>
+        </div>
+        <div class="eq-body">
+          <div class="eq-top-controls">
+            <button class="eq-button active" id="eq-on">ON</button>
+            <button class="eq-button" id="eq-auto">AUTO</button>
+            <div class="eq-preset-wrapper">
+              <select id="eq-preset-select" class="eq-preset-select" title="Equalizer Presets">
+                <option value="flat">Preset: Flat</option>
+                <option value="club">Preset: Club / Hip-Hop</option>
+                <option value="bass">Preset: Full Bass</option>
+                <option value="treble">Preset: Full Treble</option>
+                <option value="vocal">Preset: Vocal Boost (1-4 kHz)</option>
+                <option value="rock">Preset: Rock</option>
+                <option value="techno">Preset: Techno / EDM</option>
+                <option value="pop">Preset: Pop</option>
+                <option value="classical">Preset: Classical</option>
+                <option value="metal">Preset: Metal</option>
+                <option value="dance">Preset: Dance</option>
+                <option value="reggae">Preset: Reggae</option>
+                <option value="soft">Preset: Soft</option>
+                <option value="acoustic">Preset: Acoustic</option>
+                <option value="laptop">Preset: Laptop Speakers (Anti-Honk)</option>
+                <option value="party">Preset: Party</option>
+                <option value="custom">Preset: Custom...</option>
+              </select>
+              <button class="eq-button" id="btn-save-eq">SAVE</button>
+              <button class="eq-button" id="btn-load-eq">LOAD</button>
+            </div>
+          </div>
+          <div class="eq-sliders-container">
+            <div class="eq-col preamp-col">
+              <div class="slider-track-wrap">
+                <input type="range" id="eq-band-preamp" min="-12" max="12" value="0" class="eq-slider" />
+              </div>
+              <span class="eq-band-label">PREAMP</span>
+            </div>
+            <div class="eq-bands">
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="0" min="-12" max="12" value="0" class="eq-slider eq-band" title="31.5 Hz: 0.0 dB" /></div><span>31.5</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="1" min="-12" max="12" value="0" class="eq-slider eq-band" title="63 Hz: 0.0 dB" /></div><span>63</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="2" min="-12" max="12" value="0" class="eq-slider eq-band" title="125 Hz: 0.0 dB" /></div><span>125</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="3" min="-12" max="12" value="0" class="eq-slider eq-band" title="250 Hz: 0.0 dB" /></div><span>250</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="4" min="-12" max="12" value="0" class="eq-slider eq-band" title="500 Hz: 0.0 dB" /></div><span>500</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="5" min="-12" max="12" value="0" class="eq-slider eq-band" title="1 kHz: 0.0 dB" /></div><span>1K</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="6" min="-12" max="12" value="0" class="eq-slider eq-band" title="2 kHz: 0.0 dB" /></div><span>2K</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="7" min="-12" max="12" value="0" class="eq-slider eq-band" title="4 kHz: 0.0 dB" /></div><span>4K</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="8" min="-12" max="12" value="0" class="eq-slider eq-band" title="8 kHz: 0.0 dB" /></div><span>8K</span></div>
+              <div class="eq-col"><div class="slider-track-wrap"><input type="range" data-band="9" min="-12" max="12" value="0" class="eq-slider eq-band" title="16 kHz: 0.0 dB" /></div><span>16K</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PREFERENCES / SETTINGS WINDOW -->
+      <div class="winamp-window prefs-window" id="prefs-window" style="display: none;">
+        <div class="window-titlebar prefs-titlebar">
+          <div class="titlebar-handle">
+            <span class="title-text" data-i18n="prefs_title">PREFERENCES [Ctrl+P]</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-close" id="btn-prefs-close">×</button>
+          </div>
+        </div>
+        <div class="prefs-body">
+          <div class="prefs-sidebar">
+            <div class="prefs-tab active" data-target="prefs-tab-skins" data-i18n="tab_skins">Skins & Themes</div>
+            <div class="prefs-tab" data-target="prefs-tab-audio" data-i18n="tab_audio">Audio & Crossfade</div>
+            <div class="prefs-tab" data-target="prefs-tab-language" data-i18n="tab_language">Language (भाषा)</div>
+            <div class="prefs-tab" data-target="prefs-tab-keyboard" data-i18n="tab_keyboard">Keyboard Shortcuts</div>
+            <div class="prefs-tab" data-target="prefs-tab-about" data-i18n="tab_about">About Surmuni</div>
+          </div>
+          <div class="prefs-content">
+            <!-- TAB 1: SKINS -->
+            <div class="prefs-pane active" id="prefs-tab-skins">
+              <h4 class="prefs-heading">Window Layout & Snapping Mode</h4>
+              <div class="prefs-setting-item" style="margin-bottom: 12px; padding: 6px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;">
+                <label style="font-weight: bold; width: 110px;">Window Mode:</label>
+                <div style="display: flex; gap: 14px;">
+                  <label class="skin-radio-label">
+                    <input type="radio" name="window-mode" value="docked" checked />
+                    <span>Docked Stack (Single Unit)</span>
+                  </label>
+                  <label class="skin-radio-label">
+                    <input type="radio" name="window-mode" value="detached" />
+                    <span>Detached Windows (Magnetic Snapping · Alt+D)</span>
+                  </label>
+                </div>
+              </div>
+
+              <h4 class="prefs-heading" data-i18n="installed_skins">Installed Themes & Skins</h4>
+              <div class="skin-radio-group">
+                <label class="skin-radio-label">
+                  <input type="radio" name="theme-choice" value="skin-classic" checked />
+                  <span>Surmuni Classic (1998 Retro Pixel)</span>
+                </label>
+                <label class="skin-radio-label">
+                  <input type="radio" name="theme-choice" value="skin-kathmandu" />
+                  <span>Kathmandu (Modern Flat Slate · Crimson & Azure)</span>
+                </label>
+                <label class="skin-radio-label">
+                  <input type="radio" name="theme-choice" value="skin-neo2026" />
+                  <span>Neo-Surmuni 2026 ✨ (Modern Glass)</span>
+                </label>
+              </div>
+
+              <div class="prefs-button-row">
+                <button class="pl-btn" id="btn-pref-load-wsz" data-i18n="load_wsz">📂 Load Local .WSZ Skin...</button>
+                <button class="pl-btn" id="btn-pref-open-museum" data-i18n="browse_museum">🌐 Browse Skin Museum (65k+ Skins)</button>
+              </div>
+            </div>
+
+            <!-- TAB 2: AUDIO & DSP -->
+            <div class="prefs-pane" id="prefs-tab-audio" style="display: none;">
+              <h4 class="prefs-heading" data-i18n="dsp_tuning">DSP & Playback Tuning</h4>
+              <div class="prefs-setting-item">
+                <label data-i18n="crossfade_sec">Hardware Crossfade (Seconds):</label>
+                <input type="range" id="pref-crossfade-slider" min="0" max="8" value="2" step="0.5" />
+                <span id="pref-crossfade-val">2.0s</span>
+              </div>
+              <div class="prefs-setting-item">
+                <label data-i18n="autodj_label">Smart AutoDJ (Silence Trimming):</label>
+                <span class="active-badge" data-i18n="autodj_status">Enabled (Radio Transition)</span>
+              </div>
+              <div class="prefs-setting-item">
+                <label data-i18n="replaygain_label">ReplayGain Loudness Leveling:</label>
+                <span class="active-badge" data-i18n="replaygain_status">Auto (Peak-Clamped)</span>
+              </div>
+              <div class="prefs-setting-item">
+                <label>Fletcher-Munson Loudness:</label>
+                <span class="active-badge">Equal-Loudness Contour Active</span>
+              </div>
+            </div>
+
+            <!-- TAB 3: LANGUAGE -->
+            <div class="prefs-pane" id="prefs-tab-language" style="display: none;">
+              <h4 class="prefs-heading" data-i18n="language_heading">Interface Language Selection</h4>
+              <div class="prefs-setting-item">
+                <label data-i18n="language_select_label">Select Application Language:</label>
+                <select id="pref-lang-select" class="eq-preset-select" style="width: 140px;">
+                  <option value="en">English (Default)</option>
+                  <option value="ne">नेपाली (Nepali)</option>
+                  <option value="hi">हिन्दी (Hindi)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- TAB 4: KEYBOARD SHORTCUTS -->
+            <div class="prefs-pane" id="prefs-tab-keyboard" style="display: none;">
+              <h4 class="prefs-heading" data-i18n="keyboard_heading">Global Keybindings & Hotkeys</h4>
+              <table class="shortcuts-table">
+                <tr><td><b>Cmd+P / Ctrl+P</b></td><td>Open Preferences</td></tr>
+                <tr><td><b>Ctrl+L</b></td><td>Stream Internet Radio / URL</td></tr>
+                <tr><td><b>J</b></td><td>Jump to Track (Media Library)</td></tr>
+                <tr><td><b>Ctrl+Shift+K</b></td><td>Toggle MilkDrop WebGL Visualizer</td></tr>
+                <tr><td><b>Space</b></td><td>Next MilkDrop Preset</td></tr>
+                <tr><td><b>Z / X / C / V / B</b></td><td>Prev / Play / Pause / Stop / Next</td></tr>
+                <tr><td><b>Del / Backspace</b></td><td>Remove Track from Playlist</td></tr>
+              </table>
+            </div>
+
+            <!-- TAB 5: ABOUT -->
+            <div class="prefs-pane" id="prefs-tab-about" style="display: none;">
+              <h4 class="prefs-heading" data-i18n="about_heading">Surmuni v1.4.0 (GPLv3)</h4>
+              <p class="about-desc" data-i18n="about_desc1">High-Performance Retro & Modern Audio Player in Rust + Tauri v2.</p>
+              <p class="about-desc">A tribute to the golden era of Winamp 2.x modernized with audiophile DSP, WebGL MilkDrop 2, Internet Radio, Tracker synthesis, and lossless skinning.</p>
+              <p class="about-desc" style="margin-top: 8px; font-weight: bold; color: #00ff66;">Version 1.4.0 (Release Build)</p>
+              <p class="about-desc">Licensed under the GNU General Public License v3 (GPL-3.0-or-later).</p>
+            </div>
+          </div>
+        </div>
+        <div class="prefs-footer">
+          <button class="pl-btn" id="btn-prefs-ok" data-i18n="btn_close">CLOSE</button>
+        </div>
+      </div>
+
+      <!-- 4. PLAYLIST WINDOW -->
+      <div class="winamp-window playlist-window" id="pl-window">
+        <div class="window-titlebar pl-titlebar">
+          <div class="titlebar-handle">
+            <span class="title-text">PLAYLIST</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-close" id="btn-pl-close" title="Close Playlist">×</button>
+          </div>
+        </div>
+        <div class="playlist-body">
+          <div class="playlist-items-box" id="playlist-container">
+            <div class="empty-playlist-msg" data-i18n="empty_pl_msg">Drag & Drop audio files here or click "+ FILE" below</div>
+          </div>
+          <div class="playlist-bottom-bar">
+            <div class="pl-actions-left">
+              <button class="pl-btn" id="btn-add-file" data-i18n="btn_add_file">+ FILE</button>
+              <button class="pl-btn" id="btn-add-url" title="Stream Internet Radio / Podcast URL [Ctrl+L]">🌐 + URL</button>
+              <button class="pl-btn" id="btn-load-m3u" data-i18n="btn_load_pl" title="Load M3U Playlist">📂 LOAD</button>
+              <button class="pl-btn" id="btn-save-m3u" data-i18n="btn_save_pl" title="Save M3U Playlist">💾 SAVE</button>
+              <button class="pl-btn" id="btn-clear-pl" data-i18n="btn_clear_pl">- CLEAR</button>
+              <button class="pl-btn" id="btn-shuffle-pl" data-i18n="btn_shuffle_pl" title="Physically Shuffle Playlist Order">⚡ SHUFFLE</button>
+            </div>
+            <div class="pl-info-right" id="playlist-summary">
+              0 TRACKS [0:00]
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MILKDROP 2 WEBGL VISUALIZER WINDOW -->
+      <div class="winamp-window milkdrop-window" id="milkdrop-window" style="display: none;">
+        <div class="window-titlebar milkdrop-titlebar">
+          <div class="titlebar-handle">
+            <span class="title-text">MILKDROP 2 [VISUALIZER]</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-close" id="btn-milkdrop-close">×</button>
+          </div>
+        </div>
+        <div class="milkdrop-body">
+          <canvas id="milkdrop-canvas" width="480" height="260" class="milkdrop-canvas"></canvas>
+          <div class="milkdrop-bottom-bar">
+            <button class="pl-btn" id="btn-milkdrop-preset">⚡ NEXT PRESET [SPACE]</button>
+            <span id="milkdrop-preset-name">Preset: Euphoric Tunnel (Reactive WebGL)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDIA LIBRARY WINDOW (ml_local) -->
+      <div class="winamp-window library-window" id="ml-window" style="display: none;">
+        <div class="window-titlebar ml-titlebar">
+          <div class="titlebar-handle">
+            <span class="title-text">MEDIA LIBRARY</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-close" id="btn-ml-close">×</button>
+          </div>
+        </div>
+        <div class="library-body">
+          <div class="library-toolbar">
+            <input type="text" id="ml-search-input" placeholder="Jump to track (Fuzzy Search)..." class="ml-search" />
+            <button class="ml-btn" id="btn-ml-scan">+ SCAN FOLDER</button>
+          </div>
+          <div class="library-tracks-box" id="ml-tracks-container">
+            <div class="empty-playlist-msg">No tracks indexed. Click "+ SCAN FOLDER" to catalog your music directory.</div>
+          </div>
+          <div class="library-bottom-bar">
+            <span id="ml-status">SQLite Database Connected</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SKIN MUSEUM BROWSER MODAL -->
+      <div class="winamp-window museum-window" id="museum-window" style="display: none;">
+        <div class="window-titlebar museum-titlebar">
+          <div class="titlebar-handle">
+            <span class="title-text">WINAMP SKIN MUSEUM [65,000+ SKINS]</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-close" id="btn-museum-close">×</button>
+          </div>
+        </div>
+        <div class="museum-body">
+          <div class="library-toolbar">
+            <input type="text" id="museum-search-input" placeholder="Search 65,000+ skins (e.g. anime, mac, metallic)..." class="ml-search" />
+            <button class="ml-btn" id="btn-museum-search">🔍 SEARCH</button>
+          </div>
+          <div class="museum-grid-container" id="museum-grid">
+            <div class="empty-playlist-msg">Loading Skin Museum catalog...</div>
+          </div>
+          <div class="library-bottom-bar">
+            <span>Powered by Webamp & Internet Archive</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- JUMP TO FILE MODAL (J / F3) -->
+      <div class="winamp-window jump-window" id="jump-window" style="display: none;">
+        <div class="window-titlebar jump-titlebar">
+          <div class="titlebar-handle">
+            <span class="title-text">JUMP TO FILE [J / F3]</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-close" id="btn-jump-close">×</button>
+          </div>
+        </div>
+        <div class="jump-body">
+          <div class="jump-input-row">
+            <label for="jump-search-input">Search:</label>
+            <input type="text" id="jump-search-input" placeholder="Type a few words to find a track..." class="ml-search" autocomplete="off" />
+          </div>
+          <div class="jump-results-box" id="jump-results-container">
+            <div class="empty-playlist-msg">Type to search the playlist...</div>
+          </div>
+          <div class="jump-footer-bar">
+            <span class="jump-hint">Enter: Play | Q: Queue Next | Esc: Close</span>
+            <div class="jump-actions">
+              <button class="pl-btn" id="btn-jump-queue">QUEUE [Q]</button>
+              <button class="pl-btn" id="btn-jump-play" style="background: #2563eb; color: #fff;">PLAY [ENTER]</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAG EDITOR MODAL (Lofty Engine) -->
+      <div class="winamp-window library-window" id="tag-window" style="display: none;">
+        <div class="window-titlebar">
+          <div class="titlebar-handle">
+            <span class="title-text">TAG EDITOR (LOFTY ENGINE)</span>
+          </div>
+          <div class="titlebar-controls">
+            <button class="win-btn win-close" id="btn-tag-close">×</button>
+          </div>
+        </div>
+        <div class="prefs-body" style="flex-direction: column; gap: 8px; padding: 12px;">
+          <input type="hidden" id="tag-file-path" />
+          <div class="prefs-setting-item">
+            <label style="width: 90px;">Title:</label>
+            <input type="text" id="tag-input-title" class="ml-search" />
+          </div>
+          <div class="prefs-setting-item">
+            <label style="width: 90px;">Artist:</label>
+            <input type="text" id="tag-input-artist" class="ml-search" />
+          </div>
+          <div class="prefs-setting-item">
+            <label style="width: 90px;">Album:</label>
+            <input type="text" id="tag-input-album" class="ml-search" />
+          </div>
+          <div class="prefs-setting-item">
+            <label style="width: 90px;">Album Artist:</label>
+            <input type="text" id="tag-input-album-artist" class="ml-search" />
+          </div>
+          <div class="prefs-setting-item">
+            <label style="width: 90px;">Genre:</label>
+            <input type="text" id="tag-input-genre" class="ml-search" />
+          </div>
+          <div class="prefs-setting-item">
+            <label style="width: 90px;">Comment:</label>
+            <input type="text" id="tag-input-comment" class="ml-search" />
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <div class="prefs-setting-item" style="flex: 1;">
+              <label style="width: 90px;">Year:</label>
+              <input type="number" id="tag-input-year" class="ml-search" />
+            </div>
+            <div class="prefs-setting-item" style="flex: 1;">
+              <label style="width: 90px;">Track #:</label>
+              <input type="number" id="tag-input-track" class="ml-search" />
+            </div>
+          </div>
+          <div class="prefs-footer" style="padding-top: 8px; justify-content: flex-end; gap: 8px;">
+            <button class="pl-btn" id="btn-tag-cancel">CANCEL</button>
+            <button class="pl-btn" id="btn-tag-save" style="background: #2563eb; color: #fff;">💾 SAVE TAGS</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
