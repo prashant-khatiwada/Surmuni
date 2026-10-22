@@ -2237,16 +2237,21 @@ html, body {
 /* Integer Scaling Rules */
 .winamp-container.scale-1x {
   transform: none;
+  image-rendering: auto;
 }
 
 .winamp-container.scale-2x {
   transform: scale(2);
   transform-origin: top left;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 .winamp-container.scale-3x {
   transform: scale(3);
   transform-origin: top left;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 /* Retro Winamp-Styled In-App Toast Overlay */
