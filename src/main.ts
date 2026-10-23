@@ -676,6 +676,10 @@ async function initIpcListeners() {
   listen("media-key-next", () => btnNext?.click());
   listen("media-key-prev", () => btnPrev?.click());
   listen("menu-app-stop", () => btnStop?.click());
+  listen("menu-app-open-file", () => handleAddFiles());
+  listen("menu-app-open-url", () => handleAddUrl());
+  listen("menu-app-vis", () => btnVisToggle?.click());
+  listen("menu-app-lib", () => btnMlToggle?.click());
   listen("menu-app-scale-2x", () => chassis.setAppScale(chassis.currentScale === 2 ? 1 : 2));
   listen("menu-app-detached", () => chassis.setDetachedMode(true));
   listen("menu-app-eq", () => btnEqToggle?.click());

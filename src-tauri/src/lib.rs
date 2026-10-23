@@ -126,11 +126,21 @@ pub fn run() {
             let handle: AppHandle = app.handle().clone();
             let timer_status = Arc::clone(&status_for_tick);
 
-            // 1. Build Native macOS / OS Application Menu Bar
+            // 1. Build Native Cross-Platform OS Application Menu Bar
+            // On macOS this appears in the top Apple menu bar.
+            // On Windows & Linux, this binds natively to window headers.
             let app_menu_about = MenuItem::with_id(app, "menu_about", "About Surmuni", true, None::<&str>)?;
             let app_menu_prefs = MenuItem::with_id(app, "menu_prefs", "Preferences…", true, Some("CmdOrCtrl+P"))?;
             let app_menu_quit = MenuItem::with_id(app, "menu_quit", "Quit Surmuni", true, Some("CmdOrCtrl+Q"))?;
-            let app_submenu = Submenu::with_items(app, "Surmuni", true, &[&app_menu_about, &app_menu_prefs, &app_menu_quit])?;
+            
+            #[cfg(target_os = "macos")]
+            let first_submenu = Submenu::with_items(app, "Surmuni", true, &[&app_menu_about, &app_menu_prefs, &app_menu_quit])?;
+            #[cfg(not(target_os = "macos"))]
+            let file_open = MenuItem::with_id(app, "menu_open_file", "Open File(s)…", true, Some("CmdOrCtrl+O"))?;
+            #[cfg(not(target_os = "macos"))]
+            let file_url = MenuItem::with_id(app, "menu_open_url", "Open Audio URL…", true, Some("CmdOrCtrl+L"))?;
+            #[cfg(not(target_os = "macos"))]
+            let first_submenu = Submenu::with_items(app, "File", true, &[&file_open, &file_url, &app_menu_prefs, &app_menu_quit])?;
 
             let playback_play = MenuItem::with_id(app, "menu_play", "Play / Pause", true, Some("Space"))?;
             let playback_stop = MenuItem::with_id(app, "menu_stop", "Stop", true, Some("V"))?;
@@ -142,12 +152,24 @@ pub fn run() {
             let view_detached = MenuItem::with_id(app, "menu_detached", "Detached Windows", true, Some("Alt+D"))?;
             let view_eq = MenuItem::with_id(app, "menu_eq", "Equalizer", true, Some("Alt+G"))?;
             let view_pl = MenuItem::with_id(app, "menu_pl", "Playlist", true, Some("Alt+E"))?;
-            let view_submenu = Submenu::with_items(app, "View", true, &[&view_double_size, &view_detached, &view_eq, &view_pl])?;
+            let view_vis = MenuItem::with_id(app, "menu_vis", "MilkDrop 2 Visualizer", true, Some("CmdOrCtrl+Shift+K"))?;
+            let view_lib = MenuItem::with_id(app, "menu_lib", "Media Library", true, Some("CmdOrCtrl+M"))?;
+            let view_submenu = Submenu::with_items(app, "View", true, &[&view_double_size, &view_detached, &view_eq, &view_pl, &view_vis, &view_lib])?;
 
-            let root_menu = Menu::with_items(app, &[&app_submenu, &playback_submenu, &view_submenu])?;
+            #[cfg(not(target_os = "macos"))]
+            let help_about = MenuItem::with_id(app, "menu_about", "About Surmuni", true, None::<&str>)?;
+            #[cfg(not(target_os = "macos"))]
+            let help_submenu = Submenu::with_items(app, "Help", true, &[&help_about])?;
+
+            #[cfg(target_os = "macos")]
+            let root_menu = Menu::with_items(app, &[&first_submenu, &playback_submenu, &view_submenu])?;
+            #[cfg(not(target_os = "macos"))]
+            let root_menu = Menu::with_items(app, &[&first_submenu, &playback_submenu, &view_submenu, &help_submenu])?;
             let _ = app.set_menu(root_menu);
 
             app.on_menu_event(|app, event| match event.id.as_ref() {
+                "menu_open_file" => { let _ = app.emit("menu-app-open-file", ()); }
+                "menu_open_url" => { let _ = app.emit("menu-app-open-url", ()); }
                 "menu_play" => { let _ = app.emit("media-key-play-pause", ()); }
                 "menu_next" => { let _ = app.emit("media-key-next", ()); }
                 "menu_prev" => { let _ = app.emit("media-key-prev", ()); }
@@ -156,6 +178,8 @@ pub fn run() {
                 "menu_detached" => { let _ = app.emit("menu-app-detached", ()); }
                 "menu_eq" => { let _ = app.emit("menu-app-eq", ()); }
                 "menu_pl" => { let _ = app.emit("menu-app-pl", ()); }
+                "menu_vis" => { let _ = app.emit("menu-app-vis", ()); }
+                "menu_lib" => { let _ = app.emit("menu-app-lib", ()); }
                 "menu_prefs" => { let _ = app.emit("menu-app-prefs", ()); }
                 "menu_about" => { let _ = app.emit("menu-app-about", ()); }
                 "menu_quit" => { app.exit(0); }
