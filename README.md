@@ -1,130 +1,215 @@
-# Surmuni (सुरमुनि) ⚡ `v1.4.0`
+# Surmuni (सुरमुनि) ⚡ `v1.5.0`
 
 > **High-Fidelity Retro & Modern Audio Player in Rust + Tauri v2**  
-> *A tribute to the golden era of Winamp 2.x, modernized with audiophile DSP, WebGL MilkDrop 2, Internet Radio, Tracker synthesis, and lossless skinning.*
+> *A soulful tribute to the golden era of Winamp 2.x and OneAmp, modernized with audiophile DSP, standalone multi-window workspaces, WebGL MilkDrop 2, Internet Radio, Tracker synthesis, lossless skinning, and cross-platform native performance.*
 
-[![Version: 1.4.0](https://img.shields.io/badge/Version-1.4.0-brightgreen.svg)](https://github.com)
+[![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-brightgreen.svg)](https://github.com/prashant-khatiwada/Surmuni)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Built with Tauri v2](https://img.shields.io/badge/Tauri-v2-24C8DB.svg?logo=tauri)](https://tauri.app/)
 [![Rust](https://img.shields.io/badge/Rust-2024_Edition-DEA584.svg?logo=rust)](https://www.rust-lang.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg?logo=typescript)](https://www.typescriptlang.org/)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20iOS%20%26%20Android%20Ready-lightgrey.svg)]()
+[![GitHub Actions CI/CD](https://github.com/prashant-khatiwada/Surmuni/actions/workflows/release.yml/badge.svg)](https://github.com/prashant-khatiwada/Surmuni/actions)
 
 ---
 
-## ⚡ Overview
+## ⚡ Overview & Inspiration
 
-**Surmuni** is an ultra-fast, cross-platform desktop audio player engineered from scratch in Rust and modern TypeScript under **GNU GPLv3**. It reproduces the exact tactile experience and pixel grid of Winamp 2.x (authentic pixel-perfect `.wsz` skins, 10-band equalizer, mini-oscilloscopes, windowshade mode) while packing a modern high-performance engine: bit-perfect integer playback, RBJ biquad filters, Fletcher-Munson equal-loudness contours, embedded General MIDI synthesis, Lofty-powered metadata tag editing, live ICY radio streaming, recursive folder drop, and authentic **MilkDrop 2** visuals powered by **Butterchurn**.
+**Surmuni** is a cross-platform desktop audio player engineered from scratch with a high-performance **Rust** audio engine and a modern **TypeScript / WebGL** frontend orchestrated via **Tauri v2**. 
+
+### 💡 Where the Ideas Came From
+1. **Nullsoft Winamp 2.91 (1998–2003):** 
+   - The iconic 275px modular stacked window chassis (`Main`, `Equalizer`, `Playlist`).
+   - Bit-for-bit `.wsz` skin archive compatibility, bitmap font rasterization, and authentic color-index palette engines (`viscolor.txt`).
+   - Tactile feel: draggable seekbars, 29px-stepped playlist resizing, windowshade micro-bars ($14\text{px}$ / $24\text{px}$), and instant keyboard navigation (`J`, `Z/X/C/V/B`, `Space`).
+2. **OneAmp & XMPlay:**
+   - Audiophile bit-perfect decoding, continuous 10-band ISO 266 RBJ biquad equalizers, auto-headroom calculation, and dynamic Fletcher-Munson equal-loudness contours.
+   - Support for retro demoscene tracker modules (`.xm`, `.mod`, `.s3m`, `.it`) and General MIDI with SoundFont synthesis.
+3. **MilkDrop 2 (Nullsoft / Ryan Geiss):**
+   - High-definition WebGL visualizer with real-time waveform displacement, motion blur, and preset crossfading.
+4. **Modern Unix & macOS Philosophy:**
+   - Native macOS top menu bar integration (`App`, `File`, `Playback`, `View`, `Options`, `Help`) with keyboard accelerators.
+   - True decoupled multi-window architecture: standalone native **Preferences** (`Ctrl+P`), standalone **MilkDrop 2 Visualizer** (`VIS`), and standalone SQLite-powered **Media Library** (`LIB` / `J`), each with native window decorations, resizing, and IPC synchronization.
 
 ---
 
 ## 🚀 Key Features
 
-### 1. 🎛️ Unified Stack Architecture & Pixel-Perfect Skins
-- **Authentic 275px Winamp Sizing:** Fixed 275×116px coordinate mapping (`main.bmp`, `eqmain.bmp`, `pledit.bmp`) with zero image stretching, repeating, or alignment distortion.
-- **Single-Window & Detached Modes:** Switch effortlessly between a docked single unit and a free-floating magnetic canvas (`Alt+D`).
-- **Clean Titlebars:** Only the main player displays the brand name `SURMUNI` and app icon; secondary windows use clean functional headers (`EQUALIZER`, `PLAYLIST`, `MEDIA LIBRARY`, `MILKDROP 2`, `PREFERENCES`).
-- **Windowshade Mode:** Double-click the main player titlebar or click `▾` to collapse into a slim micro-bar ($24\text{ px}$).
+### 1. 🎛️ Authentic 275px Modular Chassis & Lossless Skinning
+- **Strict 275px Winamp Coordinate System:** Pixel-accurate rendering for `main.bmp`, `eqmain.bmp`, `pledit.bmp`, and `titlebar.bmp` without fractional pixel blurring or clipping.
+- **Three Default Themes Out of the Box:**
+  - **Classic 1998:** Iconic green-segmented LCD time displays, metallic knurled sliders, and retro LED peak meters.
+  - **Kathmandu (काठमाडौँ):** Elegant Himalayan-inspired theme with deep crimson accents, azure slate panels, and clean amber glow indicators.
+  - **Neo-Surmuni 2026:** Modern glass aesthetic with neon cyan/magenta styling, crisp pixel-art geometry, and high-contrast labels.
+- **Winamp Skin Museum Browser:** Live GraphQL client searching and 1-click downloading over 65,000+ authentic retro skins from the Internet Archive and Webamp collection.
+- **Local Skin Drop:** Drop any `.wsz` or `.zip` skin file into the app to unpack and hot-swap skins immediately without restarting.
+- **Windowshade Mode:** Double-click any titlebar or press the collapse button to toggle compact micro-bars.
 
-### 2. 🔊 Audiophile Audio Engine & DSP
-- **Format Support:** High-efficiency decoding of MP3, FLAC, OGG/Vorbis, WAV, AAC, M4A/MP4, AIFF, plus retro Amiga/Tracker formats (`.xm`, `.mod`, `.s3m`, `.it`) and General MIDI (`.mid`) using an embedded soundfont (`TimGM6mb.sf2`).
-- **10-Band Equalizer:** ISO 266 octave centers (31.5 Hz, 63 Hz, 125 Hz, 250 Hz, 500 Hz, 1 kHz, 2 kHz, 4 kHz, 8 kHz, 16 kHz) with $\pm12\text{ dB}$ gain range, 16 documented presets with auto-headroom preamp calculation, click-free 10ms ramping, and double-click to reset.
-- **Fletcher-Munson Loudness:** Dynamic loudness contour shelves compensating bass and treble perception at lower volume levels.
-- **Limiter & ReplayGain:** 2ms lookahead 0 dBFS peak limiter and volume normalization.
-- **Stereo Balance:** Winamp-style linear opposite-channel attenuation.
+### 2. 🪟 Decoupled Multi-Window Workspace (Native Windows)
+- **Main Chassis:** Frameless 275px docked unit with magnetic snapping and window stacking.
+- **Dedicated Preferences Window (`Ctrl+P` / `Cmd+P`):** Native macOS/Windows/Linux window with tabbed controls for Audio output devices, Equalizer curves, Theme selection, 1x/2x/3x Pixel Scaling, and Language configuration.
+- **Dedicated Visualizer Window (`VIS` button / `Ctrl+Shift+K`):** Independent floating visualizer running MilkDrop 2 presets or reactive HD Canvas 2D fallback spectrum/oscilloscope.
+- **Dedicated Media Library Window (`LIB` button / `J`):** Fast SQLite-backed music management system with instant directory indexing, album search, and track queuing.
 
-### 3. 🌌 MilkDrop 2 Visualizer (Butterchurn Engine)
-- **Authentic MilkDrop 2 WebGL2:** Integrated WebGL2 implementation of Nullsoft MilkDrop 2 via `butterchurn`.
-- **100+ Bundled Presets:** Includes legendary presets from Geiss, Rovastar, Flexi, Martin, Zylot, and Unchained via `butterchurn-presets`.
-- **Real-Time Audio Reactivity:** Fed by audio analysis with continuous frame-blending ($2.5\text{s}$ crossfades).
-- **Embedded Mini-Vis:** 4-mode faceplate visualizer cycling between **Spectrum Analyzer**, **Oscilloscope**, **Peak/RMS VU Meter** (with 1.7s peak decay), and **Off**.
+### 3. 🔊 Audiophile Audio Engine & DSP (Rust Engine)
+- **Extensive Format Support:**
+  - High-res Lossless: FLAC, WAV, AIFF, ALAC.
+  - Compressed: MP3, OGG Vorbis, AAC, M4A/MP4.
+  - Retro Tracker Chiptunes: Amiga ProTracker (`.mod`), FastTracker II (`.xm`), Scream Tracker 3 (`.s3m`), Impulse Tracker (`.it`).
+  - General MIDI: Standard MIDI (`.mid`) with embedded soundfont (`TimGM6mb.sf2`) synthesis.
+- **10-Band Graphic Equalizer:** ISO 266 center frequencies ($31.5\text{Hz}$, $63\text{Hz}$, $125\text{Hz}$, $250\text{Hz}$, $500\text{Hz}$, $1\text{kHz}$, $2\text{kHz}$, $4\text{kHz}$, $8\text{kHz}$, $16\text{kHz}$) with $\pm12\text{dB}$ gain range, auto-headroom preamp calculation, click-free parameter smoothing, and user preset import/export (`.eqf` & JSON).
+- **Fletcher-Munson Equal-Loudness:** Dynamic psychoacoustic loudness contour compensation at quiet volume levels.
+- **Peak Limiter & ReplayGain:** 2ms lookahead brickwall peak limiter to eliminate digital clipping.
+- **Stereo Balance:** Real-time opposite-channel attenuation.
 
-### 4. 📻 Live Internet Radio & ICY Metadata
-- Direct HTTP/HTTPS audio stream support (`Ctrl+L` or `🌐 + URL`).
-- In-line ICY protocol parsing (`Icy-MetaData: 1` / `StreamTitle='Artist - Track'`) with real-time marquee title updates.
+### 4. 🌌 MilkDrop 2 Visualizer (Butterchurn Engine)
+- **Full WebGL2 Shader Pipeline:** Real-time preset compilation with motion blur and seamless $2.5\text{s}$ crossfades.
+- **100+ Bundled Presets:** Works with classic presets from Geiss, Rovastar, Flexi, Martin, and Zylot.
+- **Dual Pipeline with 2D Fallback:** Automatically detects GPU capabilities; seamlessly switches to a 64-band Neon Spectrum, Multi-pass Oscilloscope, or Aurora Peak Visualizer if WebGL2 is restricted.
+- **Chassis Faceplate Mini-Vis:** Integrated 4-mode faceplate visualizer cycling between **Spectrum Analyzer**, **Oscilloscope**, **RMS/Peak VU Meter** (with $1.7\text{s}$ decay), and **Off**.
 
-### 5. 🏷️ In-App ID3 Tag Editor (Lofty Engine)
-- Right-click any playlist row to open the built-in **Tag Editor**.
-- Edit `Title`, `Artist`, `Album`, `Album Artist`, `Genre`, `Year`, `Track #`, and `Comment` directly in place using the Rust `lofty` crate.
-- Format support: ID3v1, ID3v2.3, ID3v2.4 (MP3), Vorbis Comments (FLAC, OGG), MP4 atoms (M4A/MP4), RIFF (WAV), APE. Cover art and auxiliary metadata remain untouched.
-- In-place instant refresh with zero restart.
+### 5. 📻 Internet Radio & ICY Stream Parsing
+- Stream live HTTP/HTTPS radio stations (`Ctrl+L`).
+- Real-time in-stream ICY metadata extraction (`Icy-MetaData: 1`) displaying current artist and song title in the main marquee.
 
-### 6. 📂 Playlist Management & Jump to File
-- **Drag-and-Drop:** Drag files or folders directly into the app; background recursive scan traverses subdirectories asynchronously with **`Esc`** cancellation.
-- **Jump to File (`J` or `F3`):** Search tracks instantly by typing a few words; press `Enter` to play or `Q` to queue.
-- **Play-Next Priority Queue:** Alt+Right-Click any playlist row to toggle priority order with numbered badges (`#1`, `#2`).
-- **Undo (`Ctrl+Z`):** 20-step undo history for additions, deletions, and shuffles.
-- **Format Support:** Full `.m3u`, `.m3u8`, and `.pls` load and save.
-- **Session Restore:** Persists tracks, seek position, audio volume/balance, and panel layout across restarts without auto-playing. Missing files are indicated with a dimmed state.
+### 6. 🏷️ In-App ID3 Tag Editor (Lofty Engine)
+- Right-click any track in the playlist to inspect and edit tags in-place: Title, Artist, Album, Album Artist, Genre, Year, Track Number, and Comments.
+- Native Rust engine via `lofty` supporting ID3v1, ID3v2.3, ID3v2.4, Vorbis Comments, MP4 atoms, and APE without altering existing cover art.
 
-### 7. 🎨 Classic Winamp `.wsz` Skins & Museum
-- **Surmuni Classic (1998 Retro Pixel):** Authentic metallic grooved sliders, pixel numbers, and classic viscolors.
-- **Modern Themes:** *Kathmandu* (Crimson & Azure Slate) and *Neo-Surmuni 2026* (Modern Glass).
-- **Winamp Skin Museum Browser:** Live GraphQL discovery and direct download from over 65,000+ classic skins via Webamp & Internet Archive.
-- **Local Skin Drop:** Drop or load any standard `.wsz` or `.zip` skin archive.
+### 7. 📋 Playlist Management & Undo History
+- **Recursive Directory Scan:** Drag and drop folders or storage drives; scanned in the background with `Esc` abort capability.
+- **Jump to File (`J` or `F3`):** Substring fuzzy search across thousands of tracks with keyboard selection.
+- **Play-Next Priority Queue:** Alt+Right-Click to mark queue order with badges (`#1`, `#2`, `#3`).
+- **20-Level Undo (`Ctrl+Z`):** Revert accidental deletions, re-orderings, or playlist clears.
+- **Playlist Formats:** Load and export `.m3u`, `.m3u8`, and `.pls`.
 
 ### 8. 🌐 Trilingual Localization
-- Instant language switching across **English**, **नेपाली (Nepali)**, and **हिन्दी (Hindi)**.
+- Full user interface localization across **English**, **नेपाली (Nepali)**, and **हिन्दी (Hindi)** with immediate live switching.
 
 ---
 
-## ⌨️ Keyboard Shortcuts
+## 🖥️ Platform Availability & Roadmap
+
+| Platform | Status | Packaging / Distribution |
+| :--- | :--- | :--- |
+| **macOS** (Apple Silicon `aarch64` & Intel `x86_64`) | ✅ **Available Now** | Universal `.dmg`, `.app` bundle, native menu bar integration |
+| **Windows** (x64, ARM64) | ✅ **Available Now** | Standalone `.exe`, `.msi` Windows installer |
+| **Linux** (Debian, Ubuntu, Fedora, Arch) | ✅ **Available Now** | `.deb`, `.AppImage`, `.tar.gz` |
+| **iOS / iPadOS** | 🚧 *In Progress (Phase 2)* | Single-screen responsive layout with CoreAudio backend & file picker |
+| **Android** | 🚧 *In Progress (Phase 2)* | Oboe / AAudio native Rust audio sink with scoped storage provider |
+
+---
+
+## 📅 Project Timeline & Evolution
+
+```
+2026-Q1 ────► v1.0.0: Core Rust Engine & 275px Retro Winamp Stack
+               - Bit-perfect playback, rodio audio pipeline, 10-band biquad EQ
+               - Basic .wsz skin parser, playlist management, and window docking
+
+2026-Q2 ────► v1.2.0: Audio Enhancement & MilkDrop 2 Integration
+               - Fletcher-Munson loudness contours, tracker (.xm/.mod) support
+               - TimGM6mb General MIDI synthesis
+               - Butterchurn WebGL MilkDrop 2 visualizer integration
+
+2026-Q3 ────► v1.3.0: Skin Museum & Demoscene Polishing
+               - Live GraphQL integration with Winamp Skin Museum (65,000+ skins)
+               - Lofty tag editor, ICY radio streaming marquee, and 20-step undo
+
+2026-Q4 ────► v1.4.0: Modern Desktop Multi-Window Architecture
+               - Independent Preferences window with IPC synchronization
+               - Independent toggleable MilkDrop Visualizer and SQLite Media Library
+               - Pixel-perfect skin-kathmandu & skin-neo2026 alignment (275px)
+               - macOS top menu bar cascade and 2x/3x integer pixel scaling
+
+Future  ────► v2.0.0: Mobile Expansion (iOS & Android)
+               - Touch-friendly adaptive layouts, background audio playback
+               - Cloud sync, ReplayGain 2.0, and DSP audio plug-ins
+```
+
+---
+
+## ⌨️ Keyboard Shortcuts Reference
 
 | Shortcut | Action |
 | :--- | :--- |
-| `Ctrl+P` / `Cmd+P` | Open Preferences & Settings |
-| `Ctrl+L` / `Cmd+L` | Stream Internet Radio / URL |
-| `J` / `F3` | Jump to File Modal |
-| `Q` | Add selected track to Play-Next Queue |
-| `Alt+D` | Toggle Detached Windows Mode |
-| `Ctrl+Z` | Undo Playlist Action |
-| `Ctrl+Shift+K` | Toggle MilkDrop 2 WebGL Visualizer |
-| `Space` | Play/Pause (or Next MilkDrop Preset when visualizer focused) |
+| `Ctrl+P` / `Cmd+P` | Open Dedicated Preferences Window |
+| `Ctrl+L` / `Cmd+L` | Open Internet Radio Stream URL Dialog |
+| `J` / `F3` | Jump to File / Quick Search Modal |
+| `Q` | Enqueue track to Play-Next Priority Queue |
+| `Alt+D` | Toggle Docked Stack / Detached Windows Mode |
+| `Ctrl+Z` / `Cmd+Z` | Undo last playlist modification |
+| `Ctrl+Shift+K` | Toggle MilkDrop 2 Visualizer Window |
+| `Space` | Play/Pause (or Next Preset when Visualizer is focused) |
 | `Z` / `X` / `C` / `V` / `B` | Previous / Play / Pause / Stop / Next |
-| `▾` / Double Click | Toggle Windowshade Mini-Mode |
-| `Delete` / `Backspace` | Remove Selected Track from Playlist |
+| `▾` / Double-Click Titlebar | Toggle Windowshade Mini-Mode ($14\text{px}$ / $24\text{px}$) |
+| `Delete` / `Backspace` | Remove selected track from playlist |
 
 ---
 
-## 🛠️ Building & Development
+## 🛠️ Building the Application
 
-### Prerequisites
-- **Node.js** (v18+ recommended)
-- **Rust** (2024 edition / stable toolchain)
-- **Tauri CLI v2** (`@tauri-apps/cli`)
+Surmuni can be built locally or automatically using **GitHub Actions**.
 
-### Setup & Installation
+### Option A: Automatic Cloud Builds with GitHub Actions 🚀
+This repository includes a continuous integration and release pipeline at [`.github/workflows/release.yml`](.github/workflows/release.yml).
+1. Fork or push to your repository.
+2. Go to the **Actions** tab on GitHub.
+3. Select **Release & Build Apps** and click **Run workflow**.
+4. GitHub Actions will automatically compile native installer artifacts for **macOS**, **Windows**, and **Linux**, making them available under workflow artifacts or tagged GitHub Releases!
+
+---
+
+### Option B: Local Development Build
+
+#### Prerequisites
+- **Node.js** (v18 or v20 LTS recommended)
+- **Rust Toolchain** (2024 edition, stable)
+- **C/C++ Build Tools** (Xcode Command Line Tools on macOS, Build Tools for Visual Studio on Windows, `build-essential` on Linux)
+- **Tauri CLI v2**
+
+#### 1. Clone & Install Dependencies
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/surmuni.git
-cd surmuni
+git clone https://github.com/prashant-khatiwada/Surmuni.git
+cd Surmuni
 
-# Install dependencies
+# Install frontend and module dependencies
 npm install
-
-# Run development mode (Hot-reload UI + Rust backend)
-npm run tauri dev
 ```
 
-### Production Build
+#### 2. Run in Development Mode (Live Hot Reload)
 ```bash
-# Compile optimized frontend and Rust binary
+# Runs the Vite frontend development server and compiles the Tauri Rust backend
+npx tauri dev
+```
+
+#### 3. Build Production Binaries & Installers
+```bash
+# Build frontend web assets
 npm run build
+
+# Compile optimized native binary (no packaging bundle)
 npx tauri build --no-bundle
 
-# Binary output:
-# src-tauri/target/release/surmuni
-# src-tauri/target/release/bundle/macos/Surmuni.app (macOS)
+# Or build complete platform installers (.dmg / .msi / .deb / .AppImage)
+npx tauri build
 ```
-```
+
+Binary outputs:
+- **macOS:** `src-tauri/target/release/bundle/dmg/Surmuni_1.0.0_universal.dmg` (or `surmuni` executable)
+- **Windows:** `src-tauri/target/release/bundle/msi/Surmuni_1.0.0_x64_en-US.msi`
+- **Linux:** `src-tauri/target/release/bundle/deb/surmuni_1.0.0_amd64.deb`
 
 ---
 
-## 📜 License
+## 📜 License & Acknowledgments
 
 Surmuni is licensed under the **GNU General Public License v3.0 or later** ([GPL-3.0-or-later](LICENSE)).
 
-### Third-Party Acknowledgments
-- **Butterchurn** & **Butterchurn-Presets** (MIT License) - Jordan Berg
-- **Lofty** (MIT / Apache-2.0) - Serial-ATA
-- **Rodio**, **Symphonia**, **Rustysynth**, **Xmrs** (Open Source Audio Ecosystem)
-- Winamp skin formats and classic viscolor palettes are preserved in homage to Nullsoft.
+### Open Source Acknowledgments
+- **Winamp & Nullsoft:** Dedicated with deep appreciation to the original creators of Winamp (Justin Frankel, Dmitry Boldyrev, and team) whose UI paradigms shaped computer audio history.
+- **OneAmp:** Great inspiration for audiophile DSP ideas, replay gain concepts, and modern desktop integration.
+- **Butterchurn** & **Butterchurn-Presets:** Jordan Berg (MIT License) for preserving MilkDrop 2 in WebGL.
+- **Lofty:** Serial-ATA (MIT/Apache-2.0) for audio metadata tag manipulation.
+- **Webamp & Winamp Skin Museum:** Jordan Eldredge for curating thousands of historical `.wsz` skins.
