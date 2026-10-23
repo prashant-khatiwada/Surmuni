@@ -115,6 +115,38 @@ pub fn app_close_preferences(app: tauri::AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub fn app_open_visualizer(app: tauri::AppHandle) -> Result<(), String> {
+    use tauri::Manager;
+    if let Some(vis_window) = app.get_webview_window("visualizer") {
+        let _ = vis_window.show();
+        let _ = vis_window.unminimize();
+        let _ = vis_window.set_focus();
+    } else {
+        let _ = tauri::WebviewWindowBuilder::new(
+            &app,
+            "visualizer",
+            tauri::WebviewUrl::App("visualizer.html".into())
+        )
+        .title("MilkDrop 2 Visualizer — Surmuni")
+        .inner_size(640.0, 480.0)
+        .min_inner_size(400.0, 300.0)
+        .resizable(true)
+        .decorations(true)
+        .build();
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn app_close_visualizer(app: tauri::AppHandle) -> Result<(), String> {
+    use tauri::Manager;
+    if let Some(vis_window) = app.get_webview_window("visualizer") {
+        let _ = vis_window.hide();
+    }
+    Ok(())
+}
+
+#[tauri::command]
 pub fn app_start_dragging(window: tauri::Window) {
     let _ = window.start_dragging();
 }

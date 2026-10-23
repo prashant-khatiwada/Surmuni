@@ -128,11 +128,16 @@ const milkdropCanvas = document.getElementById("milkdrop-canvas") as HTMLCanvasE
 const milkdropPresetName = document.getElementById("milkdrop-preset-name") as HTMLElement;
 const milkdrop = new MilkdropEngine(milkdropCanvas, milkdropPresetName);
 
-btnVisToggle?.addEventListener("click", () => {
-  const isHidden = milkdropWindow.style.display === "none";
-  milkdropWindow.style.display = isHidden ? "flex" : "none";
-  if (isHidden) {
-    milkdropWindow.scrollIntoView({ behavior: "smooth", block: "nearest" });
+btnVisToggle?.addEventListener("click", async () => {
+  try {
+    await invoke("app_open_visualizer");
+  } catch (err) {
+    console.warn("Could not open native visualizer window, falling back to inline window:", err);
+    const isHidden = milkdropWindow.style.display === "none";
+    milkdropWindow.style.display = isHidden ? "flex" : "none";
+    if (isHidden) {
+      milkdropWindow.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }
   syncToggleButtons();
 });
