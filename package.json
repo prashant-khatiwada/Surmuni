@@ -1,7 +1,7 @@
 {
   "name": "surmuni",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.4",
   "description": "Surmuni — Cross-platform Retro & Modern Audio Player",
   "type": "module",
   "scripts": {

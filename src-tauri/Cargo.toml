@@ -1,6 +1,6 @@
 [package]
 name = "surmuni"
-version = "1.0.0"
+version = "0.0.4"
 description = "Surmuni — Cross-platform Retro & Modern Audio Player in Rust"
 authors = ["Surmuni Contributors"]
 license = "GPL-3.0-or-later"
