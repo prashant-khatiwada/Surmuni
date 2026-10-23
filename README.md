@@ -27,9 +27,9 @@
    - Support for retro demoscene tracker modules (`.xm`, `.mod`, `.s3m`, `.it`) and General MIDI with SoundFont synthesis.
 3. **MilkDrop 2 (Nullsoft / Ryan Geiss):**
    - High-definition WebGL visualizer with real-time waveform displacement, motion blur, and preset crossfading.
-4. **Modern Unix & macOS Philosophy:**
+4. **Simple Desktop UI Design:**
    - Native macOS top menu bar integration (`App`, `File`, `Playback`, `View`, `Options`, `Help`) with keyboard accelerators.
-   - True decoupled multi-window architecture: standalone native **Preferences** (`Ctrl+P`), standalone **MilkDrop 2 Visualizer** (`VIS`), and standalone SQLite-powered **Media Library** (`LIB` / `J`), each with native window decorations, resizing, and IPC synchronization.
+   - Clean multi-window design: standalone **Preferences** (`Ctrl+P`), standalone **MilkDrop 2 Visualizer** (`VIS`), and standalone SQLite-powered **Media Library** (`LIB` / `J`), each with native window decorations, resizing, and IPC synchronization.
 
 ---
 
