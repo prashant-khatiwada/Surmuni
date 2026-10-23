@@ -17,6 +17,16 @@
 
 ---
 
+## 📸 Screenshots Gallery
+
+| **Classic 275px Player Chassis** | **Preferences Window (`Ctrl+P`)** |
+| :---: | :---: |
+| <img src="docs/screenshots/main_classic.png" width="360" alt="Main Classic Chassis" /> | <img src="docs/screenshots/preferences.png" width="460" alt="Preferences Window" /> |
+| **MilkDrop 2 Visualizer (`VIS`)** | **SQLite Media Library (`LIB`)** |
+| <img src="docs/screenshots/visualizer.png" width="360" alt="MilkDrop 2 Visualizer" /> | <img src="docs/screenshots/library.png" width="460" alt="Media Library" /> |
+
+---
+
 ## ⚡ Overview & Inspiration
 
 **Surmuni** is a cross-platform desktop audio player engineered from scratch with a high-performance **Rust** audio engine and a modern **TypeScript / WebGL** frontend orchestrated via **Tauri v2**. 
