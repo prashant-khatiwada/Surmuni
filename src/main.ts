@@ -1729,7 +1729,10 @@ window.addEventListener("beforeunload", saveSessionState);
 // Load Session State or Default Demo Track on Startup
 async function initStartupTrack() {
   const restored = await restoreSessionState();
-  if (restored) return;
+  if (restored) {
+    fitWindowToDockedStack();
+    return;
+  }
 
   try {
     const demo = await invoke<TrackMetadata | null>("get_default_demo_track");
@@ -1741,6 +1744,7 @@ async function initStartupTrack() {
   } catch (e) {
     console.warn("Could not load default demo track:", e);
   }
+  fitWindowToDockedStack();
 }
 
 // Background Native Drag & Drop with Esc Cancellation
