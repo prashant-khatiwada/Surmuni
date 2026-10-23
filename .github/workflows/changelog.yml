@@ -1,0 +1,25 @@
+name: Release Drafter & Changelog
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  update_release_draft:
+    name: Draft Release Notes & Categorized Changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Draft Release Notes
+        uses: release-drafter/release-drafter@v6
+        with:
+          config-name: release-drafter.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

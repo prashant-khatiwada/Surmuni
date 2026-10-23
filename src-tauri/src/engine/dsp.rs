@@ -158,7 +158,7 @@ where
                 for (idx, &gain_db) in eq.bands.iter().enumerate() {
                     if gain_db.abs() > 0.01 && idx < ISO_266_BANDS.len() {
                         let a_factor = 10.0f32.powf(gain_db.abs() / 40.0);
-                        let _q = 1.41421356 / (1.0 + 1.0 / a_factor);
+                        let _q = std::f32::consts::SQRT_2 / (1.0 + 1.0 / a_factor);
                         let band_mult = 10.0f32.powf(gain_db / 20.0);
                         left *= (band_mult - 1.0) * 0.12 + 1.0;
                         right *= (band_mult - 1.0) * 0.12 + 1.0;

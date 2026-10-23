@@ -1,0 +1,35 @@
+name-template: 'Surmuni $RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🚀 New Features & Enhancements'
+    labels:
+      - 'feature'
+      - 'enhancement'
+  - title: '🐛 Bug Fixes & Stability'
+    labels:
+      - 'fix'
+      - 'bug'
+  - title: '🎛️ Audio Engine & DSP'
+    labels:
+      - 'audio'
+      - 'dsp'
+  - title: '🎨 Skins, Visuals & Themes'
+    labels:
+      - 'theme'
+      - 'skin'
+      - 'ui'
+  - title: '🛠️ Architecture & Maintenance'
+    labels:
+      - 'refactor'
+      - 'chore'
+      - 'ci'
+      - 'docs'
+
+change-template: '- $TITLE by @$AUTHOR in $NUMBER'
+template: |
+  ## What's Changed in this Release
+
+  $CHANGES
+
+  ---
+  **Full Changelog**: https://github.com/prashant-khatiwada/Surmuni/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
