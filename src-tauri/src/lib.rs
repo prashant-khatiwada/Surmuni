@@ -204,9 +204,15 @@ pub fn run() {
                 ],
             )?;
 
-            let _tray = TrayIconBuilder::new()
+            let mut tray_builder = TrayIconBuilder::new()
                 .menu(&tray_menu)
-                .tooltip("Surmuni Audio Player")
+                .tooltip("Surmuni Audio Player");
+
+            if let Some(icon) = app.default_window_icon() {
+                tray_builder = tray_builder.icon(icon.clone());
+            }
+
+            let _tray = tray_builder
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "tray_play_pause" => {
                         let _ = app.emit("media-key-play-pause", ());
