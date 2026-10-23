@@ -11,6 +11,7 @@ export default defineConfig(() => ({
         main: "index.html",
         preferences: "preferences.html",
         visualizer: "visualizer.html",
+        library: "library.html",
       },
     },
   },

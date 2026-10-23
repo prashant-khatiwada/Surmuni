@@ -130,16 +130,17 @@ const milkdrop = new MilkdropEngine(milkdropCanvas, milkdropPresetName);
 
 btnVisToggle?.addEventListener("click", async () => {
   try {
-    await invoke("app_open_visualizer");
+    const isVisible = await invoke<boolean>("app_toggle_visualizer");
+    btnVisToggle.classList.toggle("active", isVisible);
   } catch (err) {
-    console.warn("Could not open native visualizer window, falling back to inline window:", err);
+    console.warn("Could not toggle native visualizer window, falling back to inline window:", err);
     const isHidden = milkdropWindow.style.display === "none";
     milkdropWindow.style.display = isHidden ? "flex" : "none";
     if (isHidden) {
       milkdropWindow.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
+    syncToggleButtons();
   }
-  syncToggleButtons();
 });
 
 btnMilkdropClose?.addEventListener("click", () => {
@@ -163,9 +164,15 @@ const mediaLibrary = new MediaLibraryManager(
   }
 );
 
-btnMlToggle?.addEventListener("click", () => {
-  mediaLibrary.toggle();
-  syncToggleButtons();
+btnMlToggle?.addEventListener("click", async () => {
+  try {
+    const isVisible = await invoke<boolean>("app_toggle_library");
+    btnMlToggle.classList.toggle("active", isVisible);
+  } catch (err) {
+    console.warn("Could not toggle native library window, falling back to inline window:", err);
+    mediaLibrary.toggle();
+    syncToggleButtons();
+  }
 });
 
 btnMlClose?.addEventListener("click", () => {
@@ -793,6 +800,15 @@ async function initGlobalMediaKeys() {
   });
   listen<SupportedLang>("pref-lang-change", (e) => {
     I18nManager.setLang(e.payload);
+  });
+
+  // Listen for track selection from Separate Media Library window
+  listen<TrackMetadata>("library-play-track", (e) => {
+    if (e.payload) {
+      playlist.addTrack(e.payload);
+      renderPlaylistView();
+      playIndex(playlist.length - 1);
+    }
   });
   listen("menu-app-about", () => {
     alert("Surmuni v1.4.0\nAuthentic, Bit-Perfect Winamp Experience in Rust + Tauri v2.\nLicensed under GNU GPLv3.");

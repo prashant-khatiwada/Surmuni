@@ -116,7 +116,11 @@ pub fn run() {
             app_open_preferences,
             app_close_preferences,
             app_open_visualizer,
-            app_close_visualizer
+            app_toggle_visualizer,
+            app_close_visualizer,
+            app_open_library,
+            app_toggle_library,
+            app_close_library
         ])
         .setup(move |app| {
             let handle: AppHandle = app.handle().clone();

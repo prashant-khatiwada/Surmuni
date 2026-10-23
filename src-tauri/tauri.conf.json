@@ -47,6 +47,18 @@
         "decorations": true,
         "resizable": true,
         "visible": false
+      },
+      {
+        "label": "library",
+        "title": "Surmuni Media Library",
+        "url": "library.html",
+        "width": 680,
+        "height": 460,
+        "minWidth": 500,
+        "minHeight": 350,
+        "decorations": true,
+        "resizable": true,
+        "visible": false
       }
     ],
     "security": {

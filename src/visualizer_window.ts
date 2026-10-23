@@ -18,6 +18,13 @@ let liveFftBands: number[] = [];
 
 function initButterchurn() {
   try {
+    const gl = canvas.getContext("webgl2");
+    if (!gl) {
+      console.warn("WebGL2 not available on canvas, starting 2D fallback spectrum directly");
+      fallbackSpectrumRenderer();
+      return;
+    }
+
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     audioContext = new AudioCtx();
 
@@ -49,7 +56,7 @@ function initButterchurn() {
 
     startRenderLoop();
   } catch (err) {
-    console.error("Butterchurn initialization error:", err);
+    console.error("Butterchurn initialization error, falling back to 2D spectrum:", err);
     fallbackSpectrumRenderer();
   }
 }

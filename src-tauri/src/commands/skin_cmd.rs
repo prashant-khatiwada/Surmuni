@@ -147,6 +147,96 @@ pub fn app_close_visualizer(app: tauri::AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub fn app_toggle_visualizer(app: tauri::AppHandle) -> Result<bool, String> {
+    use tauri::Manager;
+    if let Some(vis_window) = app.get_webview_window("visualizer") {
+        if vis_window.is_visible().unwrap_or(false) {
+            let _ = vis_window.hide();
+            return Ok(false);
+        } else {
+            let _ = vis_window.show();
+            let _ = vis_window.unminimize();
+            let _ = vis_window.set_focus();
+            return Ok(true);
+        }
+    } else {
+        let win = tauri::WebviewWindowBuilder::new(
+            &app,
+            "visualizer",
+            tauri::WebviewUrl::App("visualizer.html".into())
+        )
+        .title("MilkDrop 2 Visualizer — Surmuni")
+        .inner_size(640.0, 480.0)
+        .min_inner_size(400.0, 300.0)
+        .resizable(true)
+        .decorations(true)
+        .build();
+        return Ok(win.is_ok());
+    }
+}
+
+#[tauri::command]
+pub fn app_open_library(app: tauri::AppHandle) -> Result<(), String> {
+    use tauri::Manager;
+    if let Some(lib_window) = app.get_webview_window("library") {
+        let _ = lib_window.show();
+        let _ = lib_window.unminimize();
+        let _ = lib_window.set_focus();
+    } else {
+        let _ = tauri::WebviewWindowBuilder::new(
+            &app,
+            "library",
+            tauri::WebviewUrl::App("library.html".into())
+        )
+        .title("Surmuni Media Library")
+        .inner_size(680.0, 460.0)
+        .min_inner_size(500.0, 350.0)
+        .resizable(true)
+        .decorations(true)
+        .build();
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn app_toggle_library(app: tauri::AppHandle) -> Result<bool, String> {
+    use tauri::Manager;
+    if let Some(lib_window) = app.get_webview_window("library") {
+        if lib_window.is_visible().unwrap_or(false) {
+            let _ = lib_window.hide();
+            return Ok(false);
+        } else {
+            let _ = lib_window.show();
+            let _ = lib_window.unminimize();
+            let _ = lib_window.set_focus();
+            return Ok(true);
+        }
+    } else {
+        let win = tauri::WebviewWindowBuilder::new(
+            &app,
+            "library",
+            tauri::WebviewUrl::App("library.html".into())
+        )
+        .title("Surmuni Media Library")
+        .inner_size(680.0, 460.0)
+        .min_inner_size(500.0, 350.0)
+        .resizable(true)
+        .decorations(true)
+        .build();
+        return Ok(win.is_ok());
+    }
+}
+
+#[tauri::command]
+pub fn app_close_library(app: tauri::AppHandle) -> Result<(), String> {
+    use tauri::Manager;
+    if let Some(lib_window) = app.get_webview_window("library") {
+        let _ = lib_window.hide();
+    }
+    Ok(())
+}
+
+#[tauri::command]
 pub fn app_start_dragging(window: tauri::Window) {
     let _ = window.start_dragging();
 }

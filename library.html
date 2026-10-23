@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Surmuni Media Library</title>
+    <link rel="stylesheet" href="/src/preferences.css" />
+    <style>
+      .lib-shell {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100vh;
+        background: #141419;
+        color: #f0f0f5;
+      }
+      .lib-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: #1b1b22;
+        border-bottom: 1px solid #2d2d38;
+        gap: 12px;
+      }
+      .lib-search-box {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .lib-search-input {
+        width: 100%;
+        max-width: 400px;
+        padding: 8px 12px;
+        background: #23232c;
+        border: 1px solid #3d3d4c;
+        border-radius: 6px;
+        color: #fff;
+        font-size: 13px;
+        outline: none;
+      }
+      .lib-search-input:focus {
+        border-color: #2e62f6;
+      }
+      .lib-table-container {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .lib-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      .lib-table th {
+        position: sticky;
+        top: 0;
+        background: #1b1b22;
+        color: #9d9dae;
+        font-weight: 600;
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid #2d2d38;
+      }
+      .lib-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        cursor: pointer;
+      }
+      .lib-table tr:hover td {
+        background: #23232c;
+      }
+      .lib-table tr.selected td {
+        background: #2e62f6;
+        color: #fff;
+      }
+      .lib-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        background: #1b1b22;
+        border-top: 1px solid #2d2d38;
+        font-size: 12px;
+        color: #9d9dae;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="lib-shell">
+      <header class="lib-header">
+        <div class="lib-search-box">
+          <input
+            type="text"
+            id="lib-search"
+            class="lib-search-input"
+            placeholder="Search indexed tracks by title, artist, or album..."
+          />
+        </div>
+        <button class="btn primary" id="btn-scan-folder">📂 + SCAN FOLDER</button>
+      </header>
+
+      <div class="lib-table-container">
+        <table class="lib-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;">#</th>
+              <th>Title</th>
+              <th>Artist</th>
+              <th>Album</th>
+              <th style="width: 80px;">Duration</th>
+            </tr>
+          </thead>
+          <tbody id="lib-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 40px; color: #64748b;">
+                Loading library tracks...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="lib-footer">
+        <span id="lib-status">Connecting to SQLite media catalog...</span>
+        <span style="font-size: 11px;">Double-click track to play</span>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/library_window.ts"></script>
+  </body>
+</html>
