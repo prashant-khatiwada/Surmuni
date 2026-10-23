@@ -1,9 +1,13 @@
-# Surmuni (सुरमुनि) ⚡ `v1.5.0`
+# Surmuni (सुरमुनि) ⚡ `v0.0.4-alpha`
+
+> [!NOTE]
+> **Experimental AI Vibe Coded App — Early Alpha Release**  
+> Surmuni is an experimental, AI vibe-coded recreation and modernization of classic desktop music players, crafted rapidly with deep agentic iteration in Rust + Tauri v2. It is currently in active early alpha.
 
 > **High-Fidelity Retro & Modern Audio Player in Rust + Tauri v2**  
 > *A soulful tribute to the golden era of Winamp 2.x and OneAmp, modernized with audiophile DSP, standalone multi-window workspaces, WebGL MilkDrop 2, Internet Radio, Tracker synthesis, lossless skinning, and cross-platform native performance.*
 
-[![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-brightgreen.svg)](https://github.com/prashant-khatiwada/Surmuni)
+[![Version: 0.0.4-alpha](https://img.shields.io/badge/Version-0.0.4--alpha-orange.svg)](https://github.com/prashant-khatiwada/Surmuni)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Built with Tauri v2](https://img.shields.io/badge/Tauri-v2-24C8DB.svg?logo=tauri)](https://tauri.app/)
 [![Rust](https://img.shields.io/badge/Rust-2024_Edition-DEA584.svg?logo=rust)](https://www.rust-lang.org/)
@@ -103,26 +107,27 @@
 ## 📅 Project Timeline & Evolution
 
 ```
-2026-Q1 ────► v1.0.0: Core Rust Engine & 275px Retro Winamp Stack
+2026-Q1 ────► v0.0.1-alpha: Core Rust Engine & 275px Retro Winamp Stack
                - Bit-perfect playback, rodio audio pipeline, 10-band biquad EQ
                - Basic .wsz skin parser, playlist management, and window docking
 
-2026-Q2 ────► v1.2.0: Audio Enhancement & MilkDrop 2 Integration
+2026-Q2 ────► v0.0.2-alpha: Audio Enhancement & MilkDrop 2 Integration
                - Fletcher-Munson loudness contours, tracker (.xm/.mod) support
                - TimGM6mb General MIDI synthesis
                - Butterchurn WebGL MilkDrop 2 visualizer integration
 
-2026-Q3 ────► v1.3.0: Skin Museum & Demoscene Polishing
+2026-Q3 ────► v0.0.3-alpha: Skin Museum & Demoscene Polishing
                - Live GraphQL integration with Winamp Skin Museum (65,000+ skins)
                - Lofty tag editor, ICY radio streaming marquee, and 20-step undo
 
-2026-Q4 ────► v1.4.0: Modern Desktop Multi-Window Architecture
-               - Independent Preferences window with IPC synchronization
+2026-Q4 ────► v0.0.4-alpha: Modern Desktop Multi-Window Architecture & Cross-Platform Refactor
+               - Independent Preferences window with real-time IPC synchronization
                - Independent toggleable MilkDrop Visualizer and SQLite Media Library
-               - Pixel-perfect skin-kathmandu & skin-neo2026 alignment (275px)
-               - macOS top menu bar cascade and 2x/3x integer pixel scaling
+               - Strict 275px classic window alignment (Classic, Kathmandu, Neo2026)
+               - Native macOS/Windows/Linux menu bar integration and 2x/3x integer pixel scaling
+               - Complete architectural modularization (UI controllers, dialog modals, session manager)
 
-Future  ────► v2.0.0: Mobile Expansion (iOS & Android)
+Future  ────► v0.1.0+: Mobile Expansion (iOS & Android)
                - Touch-friendly adaptive layouts, background audio playback
                - Cloud sync, ReplayGain 2.0, and DSP audio plug-ins
 ```
